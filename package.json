@@ -3,14 +3,7 @@
         "private": true,
         "version": "0.1.0",
         "type": "module",
-        "scripts": {
-                "dev": "vite",
-                "build": "tsc -b && vite build",
-                "lint": "eslint .",
-                "preview": "vite preview",
-                "server": "tsx server/index.ts",
-                "typecheck:server": "tsc -p tsconfig.server.json --noEmit"
-        },
+        "scripts": {},
         "dependencies": {
                 "cheerio": "^1.1.2",
                 "express": "^5.1.0",

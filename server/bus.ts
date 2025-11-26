@@ -24,6 +24,10 @@ interface RawBusResponse {
 
 const BUS_SEARCH_URL = "https://wxxy.csu.edu.cn/regularbus/wap/default/index-ajax";
 
+const debug = (...args: unknown[]) => {
+  console.log(new Date().toISOString(), "[bus]", ...args);
+};
+
 export const searchBus = async ({
   date,
   startStation,
@@ -31,6 +35,13 @@ export const searchBus = async ({
   startTimeLeft,
   startTimeRight,
 }: BusRequest): Promise<BusEntry[]> => {
+  debug("searchBus start", {
+    date,
+    startStation,
+    endStation,
+    startTimeLeft,
+    startTimeRight,
+  });
   const form = new URLSearchParams();
   form.set("bus_id", "2");
   form.set("date", date);
@@ -46,10 +57,11 @@ export const searchBus = async ({
     },
     body: form,
   });
+  debug("searchBus response status", resp.status, "url", resp.url);
   if (!resp.ok) {
     throw new Error(`Bus request failed: ${resp.status}`);
   }
-  const data: RawBusResponse = await resp.json();
+  const data = (await resp.json()) as RawBusResponse;
   const buses: BusEntry[] = [];
   data?.d?.data?.forEach((entry) => {
     buses.push({
@@ -57,5 +69,6 @@ export const searchBus = async ({
       Station: entry.station,
     });
   });
+  debug("searchBus parsed buses", buses.length);
   return buses;
 };
