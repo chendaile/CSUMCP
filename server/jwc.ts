@@ -458,6 +458,144 @@ export const studentPlan = async (user: JwcUser) => {
         return plans;
 };
 
+export const summaryMarkdown = async (user: JwcUser, term = "") => {
+        debug("summaryMarkdown start", { id: user.id, term });
+        const md: string[] = [];
+        md.push("# 教务信息汇总");
+        if (term) {
+                md.push(`- 成绩学期: ${term}`);
+        }
+        md.push("");
+
+        const [grades, ranks, levelExams, minor, plans] = await Promise.all([
+                grade(user, term),
+                rank(user),
+                levelExam(user),
+                minorInfo(user),
+                studentPlan(user),
+        ]);
+
+        // 成绩
+        md.push("## 成绩");
+        if (grades.length === 0) {
+                md.push("暂无成绩数据。");
+        } else {
+                md.push("| 学期 | 课程 | 成绩 | 学分 | 课程性质 | 课程属性 |");
+                md.push("| --- | --- | --- | --- | --- | --- |");
+                grades.forEach((g) =>
+                        md.push(
+                                `| ${g.GottenTerm} | ${g.ClassName} | ${g.FinalGrade} | ${g.Credit} | ${g.ClassNature} | ${g.ClassAttribute} |`
+                        )
+                );
+        }
+        md.push("");
+
+        // 排名
+        md.push("## 排名");
+        if (ranks.length === 0) {
+                md.push("暂无排名数据。");
+        } else {
+                md.push("| 学期 | 总评 | 班级排名 | 平均分 |");
+                md.push("| --- | --- | --- | --- |");
+                ranks.forEach((r) =>
+                        md.push(
+                                `| ${r.Term} | ${r.TotalScore} | ${r.ClassRank} | ${r.AverScore} |`
+                        )
+                );
+        }
+        md.push("");
+
+        // 等级考试
+        md.push("## 等级考试");
+        if (levelExams.length === 0) {
+                md.push("暂无等级考试数据。");
+        } else {
+                md.push(
+                        "| 考试 | 笔试分 | 机试分 | 总分 | 笔试等级 | 机试等级 | 总等级 | 考试日期 |"
+                );
+                md.push(
+                        "| --- | --- | --- | --- | --- | --- | --- | --- |"
+                );
+                levelExams.forEach((e) =>
+                        md.push(
+                                `| ${e.Course} | ${e.WrittenScore} | ${e.ComputerScore} | ${e.TotalScore} | ${e.WrittenLevel} | ${e.ComputerLevel} | ${e.TotalLevel} | ${e.ExamDate} |`
+                        )
+                );
+        }
+        md.push("");
+
+        // 辅修报名与缴费
+        md.push("## 辅修报名");
+        if (minor.registrations.length === 0) {
+                md.push("暂无辅修报名信息。");
+        } else {
+                minor.registrations.forEach((reg, idx) => {
+                        md.push(
+                                `### 辅修报名 ${idx + 1}: ${reg.Major} (${reg.Department})`
+                        );
+                        md.push(
+                                `- 类型: ${reg.Type}  状态: ${reg.Status}`
+                        );
+                        if (reg.Plan.length === 0) {
+                                md.push("- 培养方案: 暂无数据");
+                        } else {
+                                md.push(
+                                        "| 序号 | 开课学期 | 课程编号 | 课程名称 | 学分 | 学时 | 考核方式 | 课程属性 | 是否考试 |"
+                                );
+                                md.push(
+                                        "| --- | --- | --- | --- | --- | --- | --- | --- | --- |"
+                                );
+                                reg.Plan.forEach((p) =>
+                                        md.push(
+                                                `| ${p.Index} | ${p.Term} | ${p.CourseId} | ${p.CourseName} | ${p.Credit} | ${p.Hours} | ${p.ExamType} | ${p.CourseAttr} | ${p.IsExam} |`
+                                        )
+                                );
+                        }
+                        md.push("");
+                });
+        }
+
+        md.push("## 辅修选课缴费");
+        if (minor.payments.length === 0) {
+                md.push("暂无辅修缴费数据。");
+        } else {
+                md.push(
+                        "| 序号 | 课程编号 | 课程名称 | 开课单位 | 上课班级 | 上课地点 | 上课时间 | 教师 | 学分 | 学时 | 金额 | 是否缴费 |"
+                );
+                md.push(
+                        "| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |"
+                );
+                minor.payments.forEach((p) =>
+                        md.push(
+                                `| ${p.Index} | ${p.CourseId} | ${p.CourseName} | ${p.Department} | ${p.Class} | ${p.Place} | ${p.Time} | ${p.Teacher} | ${p.Credit} | ${p.Hours} | ${p.Fee} | ${p.Paid} |`
+                        )
+                );
+        }
+        md.push("");
+
+        // 执行计划 / 培养方案
+        md.push("## 执行计划（培养方案）");
+        if (plans.length === 0) {
+                md.push("暂无执行计划数据。");
+        } else {
+                md.push(
+                        "| 序号 | 开课学期 | 课程编号 | 课程名称 | 学分 | 总学时 | 考核方式 | 课程属性 | 是否考试 | 微调原因 |"
+                );
+                md.push(
+                        "| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |"
+                );
+                plans.forEach((p) =>
+                        md.push(
+                                `| ${p.Index} | ${p.Term} | ${p.CourseId} | ${p.CourseName} | ${p.Credit} | ${p.Hours} | ${p.ExamType} | ${p.CourseAttr} | ${p.IsExam} | ${p.AdjustReason} |`
+                        )
+                );
+        }
+
+        const result = md.join("\n");
+        debug("summaryMarkdown generated length", result.length);
+        return result;
+};
+
 const parseFilenameFromDisposition = (disposition: string | null) => {
         if (!disposition) return "";
         const utf8Match = /filename\*=UTF-8''([^;]+)/i.exec(disposition);

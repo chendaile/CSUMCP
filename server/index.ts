@@ -7,6 +7,7 @@ import {
         studentInfo,
         minorInfo,
         studentPlan,
+        summaryMarkdown,
 } from "./jwc.js";
 import { searchBus } from "./bus.js";
 
@@ -58,6 +59,7 @@ app.get("/", (_req, res) => {
                         "/api/jwc/:id/:pwd/studentinfo",
                         "/api/jwc/:id/:pwd/studentplan",
                         "/api/jwc/:id/:pwd/minorinfo",
+                        "/api/jwc/:id/:pwd/summary?term=",
                         "/api/bus?date=&crs01=&crs02=",
                 ],
         });
@@ -191,6 +193,25 @@ app.get("/api/jwc/:id/:pwd/studentplan", async (req, res) => {
                         error instanceof Error ? error.message : String(error);
                 console.error("[server][studentplan] error:", message, error);
                 res.json({ StateCode: -1, Error: message, Plan: [] });
+        }
+});
+
+app.get("/api/jwc/:id/:pwd/summary", async (req, res) => {
+        try {
+                const term =
+                        typeof req.query.term === "string"
+                                ? req.query.term
+                                : "";
+                const md = await summaryMarkdown(
+                        { id: req.params.id, pwd: req.params.pwd },
+                        term
+                );
+                res.type("text/markdown").send(md);
+        } catch (error) {
+                const message =
+                        error instanceof Error ? error.message : String(error);
+                console.error("[server][summary] error:", message, error);
+                res.status(500).send(`# 获取失败\n\n- 错误: ${message}`);
         }
 });
 
