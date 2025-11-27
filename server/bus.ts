@@ -1,11 +1,11 @@
 import fetch from "node-fetch";
 
 export interface BusRequest {
-  date: string;
-  startStation: string;
-  endStation: string;
-  startTimeLeft: string;
-  startTimeRight: string;
+  date?: string;
+  startStation?: string;
+  endStation?: string;
+  startTimeLeft?: string;
+  startTimeRight?: string;
 }
 
 export interface BusEntry {
@@ -44,11 +44,12 @@ export const searchBus = async ({
   });
   const form = new URLSearchParams();
   form.set("bus_id", "2");
-  form.set("date", date);
-  form.set("cfz", startStation);
-  form.set("ddz", endStation);
-  form.set("fcsjStart", startTimeLeft);
-  form.set("fcsjEnd", startTimeRight);
+  form.set("type", "");
+  form.set("date", date ?? "");
+  form.set("cfz", startStation ?? "");
+  form.set("ddz", endStation ?? "");
+  form.set("fcsjStart", startTimeLeft ?? "");
+  form.set("fcsjEnd", startTimeRight ?? "");
 
   const resp = await fetch(BUS_SEARCH_URL, {
     method: "POST",

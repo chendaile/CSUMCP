@@ -40,22 +40,22 @@ app.use((req, res, next) => {
 });
 
 app.get("/", (_req, res) => {
-        res.json({
-                service: "CSU MCP",
-                routes: [
-                        "/api/jwc/:id/:pwd/grade/:term",
+                res.json({
+                        service: "CSU MCP",
+                        routes: [
+                        "/api/jwc/:id/:pwd/grade?term=",
                         "/api/jwc/:id/:pwd/rank",
                         "/api/jwc/:id/:pwd/class/:term/:week",
-                        "/api/bus/:date/:startstation/:endstation/:starttimeleft/:starttimeright",
+                        "/api/bus?date=&crs01=&crs02=",
                 ],
         });
 });
 
-app.get("/api/jwc/:id/:pwd/grade/:term", async (req, res) => {
+app.get("/api/jwc/:id/:pwd/grade", async (req, res) => {
         try {
                 const grades = await grade(
                         { id: req.params.id, pwd: req.params.pwd },
-                        req.params.term
+                        typeof req.query.term === "string" ? req.query.term : ""
                 );
                 res.json({ StateCode: 1, Error: "", Grades: grades });
         } catch (error) {
@@ -107,28 +107,30 @@ app.get("/api/jwc/:id/:pwd/class/:term/:week", async (req, res) => {
         }
 });
 
-app.get(
-        "/api/bus/:date/:startstation/:endstation/:starttimeleft/:starttimeright",
-        async (req, res) => {
-                try {
-                        const buses = await searchBus({
-                                date: req.params.date,
-                                startStation: req.params.startstation,
-                                endStation: req.params.endstation,
-                                startTimeLeft: req.params.starttimeleft,
-                                startTimeRight: req.params.starttimeright,
-                        });
-                        res.json({ StateCode: 1, Err: "", Buses: buses });
-                } catch (error) {
-                        const message =
-                                error instanceof Error
-                                        ? error.message
-                                        : String(error);
-                        console.error("[server][bus] error:", message, error);
-                        res.json({ StateCode: -1, Err: message, Buses: [] });
-                }
+app.get("/api/bus", async (req, res) => {
+        try {
+                const getQ = (key: string): string => {
+                        const v = req.query[key] as string | string[] | undefined;
+                        if (Array.isArray(v)) return v[0] ?? "";
+                        if (v === "null" || v === "undefined" || v === undefined)
+                                return "";
+                        return String(v);
+                };
+                const buses = await searchBus({
+                        date: getQ("date"),
+                        startStation: getQ("crs01"),
+                        endStation: getQ("crs02"),
+                        startTimeLeft: "",
+                        startTimeRight: "",
+                });
+                res.json({ StateCode: 1, Err: "", Buses: buses });
+        } catch (error) {
+                const message =
+                        error instanceof Error ? error.message : String(error);
+                console.error("[server][bus] error:", message, error);
+                res.json({ StateCode: -1, Err: message, Buses: [] });
         }
-);
+});
 
 app.listen(PORT, () => {
         console.log(`Node API listening on :${PORT}`);

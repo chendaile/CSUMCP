@@ -5,7 +5,21 @@
       "args": [
         "-y",
         "@playwright/mcp@0.0.38"
+      ],
+      "alwaysAllow": [
+        "browser_navigate",
+        "browser_close"
       ]
+    },
+    "tavily": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "tavily-mcp@0.2.3"
+      ],
+      "env": {
+        "TAVILY_API_KEY": "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"
+      }
     }
   }
 }
