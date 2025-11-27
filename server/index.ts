@@ -1,5 +1,13 @@
 import express from "express";
-import { classes, grade, rank } from "./jwc.js";
+import {
+        classes,
+        grade,
+        rank,
+        levelExam,
+        studentInfo,
+        minorInfo,
+        studentPlan,
+} from "./jwc.js";
 import { searchBus } from "./bus.js";
 
 const app = express();
@@ -40,12 +48,16 @@ app.use((req, res, next) => {
 });
 
 app.get("/", (_req, res) => {
-                res.json({
-                        service: "CSU MCP",
-                        routes: [
+        res.json({
+                service: "CSU MCP",
+                routes: [
                         "/api/jwc/:id/:pwd/grade?term=",
                         "/api/jwc/:id/:pwd/rank",
                         "/api/jwc/:id/:pwd/class/:term/:week",
+                        "/api/jwc/:id/:pwd/levelexam",
+                        "/api/jwc/:id/:pwd/studentinfo",
+                        "/api/jwc/:id/:pwd/studentplan",
+                        "/api/jwc/:id/:pwd/minorinfo",
                         "/api/bus?date=&crs01=&crs02=",
                 ],
         });
@@ -107,12 +119,94 @@ app.get("/api/jwc/:id/:pwd/class/:term/:week", async (req, res) => {
         }
 });
 
+app.get("/api/jwc/:id/:pwd/levelexam", async (req, res) => {
+        try {
+                const exams = await levelExam({
+                        id: req.params.id,
+                        pwd: req.params.pwd,
+                });
+                res.json({ StateCode: 1, Error: "", LevelExams: exams });
+        } catch (error) {
+                const message =
+                        error instanceof Error ? error.message : String(error);
+                console.error("[server][levelexam] error:", message, error);
+                res.json({ StateCode: -1, Error: message, LevelExams: [] });
+        }
+});
+
+app.get("/api/jwc/:id/:pwd/studentinfo", async (req, res) => {
+        try {
+                const file = await studentInfo({
+                        id: req.params.id,
+                        pwd: req.params.pwd,
+                });
+                res.setHeader("Content-Type", file.contentType);
+                res.setHeader(
+                        "Content-Disposition",
+                        file.contentDisposition
+                );
+                res.send(file.buffer);
+        } catch (error) {
+                const message =
+                        error instanceof Error ? error.message : String(error);
+                console.error("[server][studentinfo] error:", message, error);
+                res.status(500).json({ StateCode: -1, Error: message });
+        }
+});
+
+app.get("/api/jwc/:id/:pwd/minorinfo", async (req, res) => {
+        try {
+                const data = await minorInfo({
+                        id: req.params.id,
+                        pwd: req.params.pwd,
+                });
+                res.json({
+                        StateCode: 1,
+                        Error: "",
+                        Registrations: data.registrations,
+                        Payments: data.payments,
+                });
+        } catch (error) {
+                const message =
+                        error instanceof Error ? error.message : String(error);
+                console.error("[server][minorinfo] error:", message, error);
+                res.json({
+                        StateCode: -1,
+                        Error: message,
+                        Registrations: [],
+                        Payments: [],
+                });
+        }
+});
+
+app.get("/api/jwc/:id/:pwd/studentplan", async (req, res) => {
+        try {
+                const plans = await studentPlan({
+                        id: req.params.id,
+                        pwd: req.params.pwd,
+                });
+                res.json({ StateCode: 1, Error: "", Plan: plans });
+        } catch (error) {
+                const message =
+                        error instanceof Error ? error.message : String(error);
+                console.error("[server][studentplan] error:", message, error);
+                res.json({ StateCode: -1, Error: message, Plan: [] });
+        }
+});
+
 app.get("/api/bus", async (req, res) => {
         try {
                 const getQ = (key: string): string => {
-                        const v = req.query[key] as string | string[] | undefined;
+                        const v = req.query[key] as
+                                | string
+                                | string[]
+                                | undefined;
                         if (Array.isArray(v)) return v[0] ?? "";
-                        if (v === "null" || v === "undefined" || v === undefined)
+                        if (
+                                v === "null" ||
+                                v === "undefined" ||
+                                v === undefined
+                        )
                                 return "";
                         return String(v);
                 };
