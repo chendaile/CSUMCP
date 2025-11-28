@@ -1,73 +1,45 @@
-# React + TypeScript + Vite
+# CSU MCP
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+本项目提供 CSU 校园相关 API + MCP 代理，支持两种运行方式：
 
-Currently, two official plugins are available:
+- HTTP（SSE）模式：适合 HTTP 连接。
+- stdio 模式：适合通过 `npx` 拉起 MCP 的客户端。
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 快速开始
 
-## React Compiler
+1. 安装依赖  
+   `npm install`
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+2. 启动 API（教务/图书馆等）  
+   `npx csu-api`  
+   默认监听 12000，可用 `PORT` 自定义。
 
-## Expanding the ESLint configuration
+3. 启动 MCP
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- HTTP（SSE）(默认 13000 端口)：`API_BASE_URL=http://127.0.0.1:12000 npx csu-mcp-sse`
+- stdio：`API_BASE_URL=http://127.0.0.1:12000 npx csu-mcp-stdio`
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+客户端配置示例（stdio）：
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```json
+"csu": {
+  "command": "npx",
+  "args": ["-y", "csu-mcp-stdio@0.1.0"]
+}
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## 工具列表
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+- csu.grade：查询成绩，可选 term（示例：2024-2025-1）。
+- csu.rank：查询专业排名。
+- csu.classes：课表（term，week；week=0 表示全周）。
+- csu.level_exam：等级考试。
+- csu.student_info：学生信息 PDF（base64）。
+- csu.student_plan：培养计划。
+- csu.minor_info：辅修报名与缴费。
+- csu.summary：成绩 Markdown 汇总（term 隐藏，取全部学期）。
+- csu.library_db_search：电子资源检索。
+- csu.library_book_search：馆藏检索。
+- csu.library_book_copies：复本/借阅信息。
+- csu.library_seat_campuses：座位校区列表。
+- csu.bus：校车查询（date，crs01/02 途径站）。

@@ -1,13 +1,26 @@
 {
         "name": "csu-mcp",
-        "private": true,
+        "private": false,
         "version": "0.1.0",
         "type": "module",
-        "scripts": {
-                "dev": "vite",
-                "build": "vite build",
-                "preview": "vite preview"
+        "bin": {
+                "csu-mcp-sse": "./mcp/bin-sse.mjs",
+                "csu-api": "./server/bin.mjs",
+                "csu-mcp-stdio": "./mcp/bin-stdio.mjs"
         },
+        "scripts": {
+                "start:mcp:http": "node --import tsx/esm mcp/http.ts",
+                "start:mcp:stdio": "node --import tsx/esm mcp/stdio.ts",
+                "start:api": "node --import tsx/esm server/index.ts"
+        },
+        "files": [
+                "package.json",
+                "README.md",
+                "mcp",
+                "server",
+                "tsconfig.mcp.json",
+                "tsconfig.server.json"
+        ],
         "dependencies": {
                 "@modelcontextprotocol/sdk": "^0.6.0",
                 "cheerio": "^1.1.2",
@@ -17,7 +30,8 @@
                 "react": "^19.2.0",
                 "react-dom": "^19.2.0",
                 "tough-cookie": "^6.0.0",
-                "zod": "^3.24.1"
+                "zod": "^3.24.1",
+                "tsx": "^4.20.6"
         },
         "devDependencies": {
                 "@eslint/js": "^9.39.1",
@@ -30,7 +44,6 @@
                 "eslint-plugin-react-hooks": "^7.0.1",
                 "eslint-plugin-react-refresh": "^0.4.24",
                 "globals": "^16.5.0",
-                "tsx": "^4.20.6",
                 "typescript": "~5.9.3",
                 "typescript-eslint": "^8.46.4",
                 "vite": "^7.2.4"

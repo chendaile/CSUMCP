@@ -1,0 +1,14 @@
+frontend
+dist
+third-party
+tmp
+*.tgz
+node_modules
+.DS_Store
+.vscode
+*.log
+index.html
+vite.config.ts
+tsconfig.frontend.json
+tsconfig.vite.json
+eslint.config.js

@@ -154,10 +154,7 @@ app.get("/api/jwc/:id/:pwd/studentinfo", async (req, res) => {
                         pwd: req.params.pwd,
                 });
                 res.setHeader("Content-Type", file.contentType);
-                res.setHeader(
-                        "Content-Disposition",
-                        file.contentDisposition
-                );
+                res.setHeader("Content-Disposition", file.contentDisposition);
                 res.send(file.buffer);
         } catch (error) {
                 const message =
@@ -273,19 +270,22 @@ app.get("/api/library/dbsearch", async (req, res) => {
         } catch (error) {
                 const message =
                         error instanceof Error ? error.message : String(error);
-                console.error("[server][library dbsearch] error:", message, error);
+                console.error(
+                        "[server][library dbsearch] error:",
+                        message,
+                        error
+                );
                 res.json({
                         StateCode: -1,
                         Error: message,
-                                Data: { Chinese: [], Foreign: [] },
+                        Data: { Chinese: [], Foreign: [] },
                 });
         }
 });
 
 app.get("/api/library/:id/:pwd/booksearch", async (req, res) => {
         try {
-                const kw =
-                        typeof req.query.kw === "string" ? req.query.kw : "";
+                const kw = typeof req.query.kw === "string" ? req.query.kw : "";
                 if (!kw) {
                         return res.json({
                                 StateCode: -1,
@@ -301,8 +301,9 @@ app.get("/api/library/:id/:pwd/booksearch", async (req, res) => {
                         StateCode: 1,
                         Error: "",
                         Status: data.status,
-                        Data: (data.parsed ||
-                                data.body) as LibraryBookSearchResult | string,
+                        Data: (data.parsed || data.body) as
+                                | LibraryBookSearchResult
+                                | string,
                 });
         } catch (error) {
                 const message =
@@ -385,5 +386,5 @@ app.get("/api/library/seat/campuses", async (_req, res) => {
 });
 
 app.listen(PORT, () => {
-        console.log(`Node API listening on :${PORT}`);
+        console.log(`CSU API 已启动, 端口 :${PORT}`);
 });
