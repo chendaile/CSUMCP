@@ -9,6 +9,13 @@ import {
         studentPlan,
         summaryMarkdown,
 } from "./jwc.js";
+import {
+        searchLibraryDb,
+        searchLibraryBooks,
+        fetchBookCopies,
+        fetchSeatCampuses,
+        type LibraryBookSearchResult,
+} from "./library.js";
 import { searchBus } from "./bus.js";
 
 const app = express();
@@ -60,6 +67,10 @@ app.get("/", (_req, res) => {
                         "/api/jwc/:id/:pwd/studentplan",
                         "/api/jwc/:id/:pwd/minorinfo",
                         "/api/jwc/:id/:pwd/summary?term=",
+                        "/api/library/dbsearch?elecName=",
+                        "/api/library/:id/:pwd/booksearch?kw=",
+                        "/api/library/:id/:pwd/bookcopies/:recordId",
+                        "/api/library/seat/campuses",
                         "/api/bus?date=&crs01=&crs02=",
                 ],
         });
@@ -244,6 +255,135 @@ app.get("/api/bus", async (req, res) => {
                         error instanceof Error ? error.message : String(error);
                 console.error("[server][bus] error:", message, error);
                 res.json({ StateCode: -1, Err: message, Buses: [] });
+        }
+});
+
+app.get("/api/library/dbsearch", async (req, res) => {
+        try {
+                const elecName =
+                        typeof req.query.elecName === "string"
+                                ? req.query.elecName
+                                : "";
+                if (!elecName) {
+                        return res.json({
+                                StateCode: -1,
+                                Error: "缺少 elecName 参数",
+                                Data: { Chinese: [], Foreign: [] },
+                        });
+                }
+                const data = await searchLibraryDb(elecName);
+                res.json({ StateCode: 1, Error: "", Data: data });
+        } catch (error) {
+                const message =
+                        error instanceof Error ? error.message : String(error);
+                console.error("[server][library dbsearch] error:", message, error);
+                res.json({
+                        StateCode: -1,
+                        Error: message,
+                                Data: { Chinese: [], Foreign: [] },
+                });
+        }
+});
+
+app.get("/api/library/:id/:pwd/booksearch", async (req, res) => {
+        try {
+                const kw =
+                        typeof req.query.kw === "string" ? req.query.kw : "";
+                if (!kw) {
+                        return res.json({
+                                StateCode: -1,
+                                Error: "缺少 kw 参数",
+                                Data: "",
+                        });
+                }
+                const data = await searchLibraryBooks(
+                        { id: req.params.id, pwd: req.params.pwd },
+                        kw
+                );
+                res.json({
+                        StateCode: 1,
+                        Error: "",
+                        Status: data.status,
+                        Data: (data.parsed ||
+                                data.body) as LibraryBookSearchResult | string,
+                });
+        } catch (error) {
+                const message =
+                        error instanceof Error ? error.message : String(error);
+                console.error(
+                        "[server][library booksearch] error:",
+                        message,
+                        error
+                );
+                res.json({
+                        StateCode: -1,
+                        Error: message,
+                        Status: 0,
+                        Data: "",
+                });
+        }
+});
+
+app.get("/api/library/:id/:pwd/bookcopies/:recordId", async (req, res) => {
+        try {
+                const recordId = req.params.recordId;
+                if (!recordId) {
+                        return res.json({
+                                StateCode: -1,
+                                Error: "缺少 recordId 参数",
+                                Data: "",
+                        });
+                }
+                const data = await fetchBookCopies(
+                        { id: req.params.id, pwd: req.params.pwd },
+                        recordId
+                );
+                res.json({
+                        StateCode: 1,
+                        Error: "",
+                        Status: data.status,
+                        Data: data.parsed || data.body,
+                });
+        } catch (error) {
+                const message =
+                        error instanceof Error ? error.message : String(error);
+                console.error(
+                        "[server][library bookcopies] error:",
+                        message,
+                        error
+                );
+                res.json({
+                        StateCode: -1,
+                        Error: message,
+                        Status: 0,
+                        Data: "",
+                });
+        }
+});
+
+app.get("/api/library/seat/campuses", async (_req, res) => {
+        try {
+                const data = await fetchSeatCampuses();
+                res.json({
+                        StateCode: 1,
+                        Error: "",
+                        Status: data.status,
+                        Data: data.parsed || data.body,
+                });
+        } catch (error) {
+                const message =
+                        error instanceof Error ? error.message : String(error);
+                console.error(
+                        "[server][library seat campuses] error:",
+                        message,
+                        error
+                );
+                res.json({
+                        StateCode: -1,
+                        Error: message,
+                        Status: 0,
+                        Data: "",
+                });
         }
 });
 
