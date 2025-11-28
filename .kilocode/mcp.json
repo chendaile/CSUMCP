@@ -1,25 +1,24 @@
 {
-  "mcpServers": {
-    "playwright": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "@playwright/mcp@0.0.38"
-      ],
-      "alwaysAllow": [
-        "browser_navigate",
-        "browser_close"
-      ]
-    },
-    "tavily": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "tavily-mcp@0.2.3"
-      ],
-      "env": {
-        "TAVILY_API_KEY": "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"
-      }
-    }
-  }
+        "mcpServers": {
+                "playwright": {
+                        "command": "npx",
+                        "args": ["-y", "@playwright/mcp@0.0.38"],
+                        "alwaysAllow": ["browser_navigate", "browser_close"]
+                },
+                "tavily": {
+                        "command": "npx",
+                        "args": ["-y", "tavily-mcp@0.2.3"],
+                        "env": {
+                                "TAVILY_API_KEY": "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"
+                        }
+                },
+                "context7": {
+                        "type": "streamable-http",
+                        "url": "https://mcp.context7.com/mcp"
+                },
+                "csu": {
+                        "type": "sse",
+                        "url": "http://127.0.0.1:13000"
+                }
+        }
 }
