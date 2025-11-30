@@ -1,5 +1,6 @@
 import { load as loadHTML } from "cheerio";
 import { authenticatedRequest, login } from "./auth.js";
+import { logger } from "../logger.js";
 
 export interface JwcUser {
         id: string;
@@ -104,7 +105,7 @@ const JWC_BASE_HOST = "http://csujwc.its.csu.edu.cn";
 const JWC_STUDENT_PLAN_URL = `${JWC_BASE_URL}pyfa/pyfa_query`;
 
 const debug = (...args: unknown[]) => {
-        console.log(new Date().toISOString(), "[jwc]", ...args);
+        logger.info("[jwc]", ...args);
 };
 
 export const grade = async (user: JwcUser, term = "") => {

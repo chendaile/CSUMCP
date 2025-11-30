@@ -1,4 +1,5 @@
 import fetch from "node-fetch";
+import { logger } from "../logger.js";
 
 export interface BusRequest {
   date?: string;
@@ -25,7 +26,7 @@ interface RawBusResponse {
 const BUS_SEARCH_URL = "https://wxxy.csu.edu.cn/regularbus/wap/default/index-ajax";
 
 const debug = (...args: unknown[]) => {
-  console.log(new Date().toISOString(), "[bus]", ...args);
+  logger.info("[bus]", ...args);
 };
 
 export const searchBus = async ({

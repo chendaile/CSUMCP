@@ -16,6 +16,7 @@ import {
         fetchSeatCampuses,
 } from "./library.js";
 import { searchBus } from "./bus.js";
+import { logger } from "../logger.js";
 
 const app = express();
 const PORT = process.env.PORT || 12000;
@@ -27,7 +28,7 @@ const maskSensitive = (value?: string) => {
 };
 
 const logDebug = (...args: unknown[]) => {
-        console.log(new Date().toISOString(), "[server]", ...args);
+        logger.info("[server]", ...args);
 };
 
 app.use((req, res, next) => {
@@ -85,7 +86,7 @@ app.get("/api/jwc/:id/:pwd/grade", async (req, res) => {
         } catch (error) {
                 const message =
                         error instanceof Error ? error.message : String(error);
-                console.error("[server][grade] error:", message, error);
+                logger.error("[server][grade] error:", message, error);
                 res.json({ StateCode: -1, Error: message, Grades: [] });
         }
 });
@@ -100,7 +101,7 @@ app.get("/api/jwc/:id/:pwd/rank", async (req, res) => {
         } catch (error) {
                 const message =
                         error instanceof Error ? error.message : String(error);
-                console.error("[server][rank] error:", message, error);
+                logger.error("[server][rank] error:", message, error);
                 res.json({ StateCode: -1, Error: message, Rank: [] });
         }
 });
@@ -121,7 +122,7 @@ app.get("/api/jwc/:id/:pwd/class/:term/:week", async (req, res) => {
         } catch (error) {
                 const message =
                         error instanceof Error ? error.message : String(error);
-                console.error("[server][class] error:", message, error);
+                logger.error("[server][class] error:", message, error);
                 res.json({
                         StateCode: -1,
                         Error: message,
@@ -141,7 +142,7 @@ app.get("/api/jwc/:id/:pwd/levelexam", async (req, res) => {
         } catch (error) {
                 const message =
                         error instanceof Error ? error.message : String(error);
-                console.error("[server][levelexam] error:", message, error);
+                logger.error("[server][levelexam] error:", message, error);
                 res.json({ StateCode: -1, Error: message, LevelExams: [] });
         }
 });
@@ -158,7 +159,7 @@ app.get("/api/jwc/:id/:pwd/studentinfo", async (req, res) => {
         } catch (error) {
                 const message =
                         error instanceof Error ? error.message : String(error);
-                console.error("[server][studentinfo] error:", message, error);
+                logger.error("[server][studentinfo] error:", message, error);
                 res.status(500).json({ StateCode: -1, Error: message });
         }
 });
@@ -178,7 +179,7 @@ app.get("/api/jwc/:id/:pwd/minorinfo", async (req, res) => {
         } catch (error) {
                 const message =
                         error instanceof Error ? error.message : String(error);
-                console.error("[server][minorinfo] error:", message, error);
+                logger.error("[server][minorinfo] error:", message, error);
                 res.json({
                         StateCode: -1,
                         Error: message,
@@ -198,7 +199,7 @@ app.get("/api/jwc/:id/:pwd/studentplan", async (req, res) => {
         } catch (error) {
                 const message =
                         error instanceof Error ? error.message : String(error);
-                console.error("[server][studentplan] error:", message, error);
+                logger.error("[server][studentplan] error:", message, error);
                 res.json({ StateCode: -1, Error: message, Plan: [] });
         }
 });
@@ -214,7 +215,7 @@ app.get("/api/jwc/:id/:pwd/summary", async (req, res) => {
         } catch (error) {
                 const message =
                         error instanceof Error ? error.message : String(error);
-                console.error("[server][summary] error:", message, error);
+                logger.error("[server][summary] error:", message, error);
                 res.status(500).send(`# 获取失败\n\n- 错误: ${message}`);
         }
 });
@@ -246,7 +247,7 @@ app.get("/api/bus", async (req, res) => {
         } catch (error) {
                 const message =
                         error instanceof Error ? error.message : String(error);
-                console.error("[server][bus] error:", message, error);
+                logger.error("[server][bus] error:", message, error);
                 res.json({ StateCode: -1, Err: message, Buses: [] });
         }
 });
@@ -269,7 +270,7 @@ app.get("/api/library/dbsearch", async (req, res) => {
         } catch (error) {
                 const message =
                         error instanceof Error ? error.message : String(error);
-                console.error(
+                logger.error(
                         "[server][library dbsearch] error:",
                         message,
                         error
@@ -305,7 +306,7 @@ app.get("/api/library/:id/:pwd/booksearch", async (req, res) => {
         } catch (error) {
                 const message =
                         error instanceof Error ? error.message : String(error);
-                console.error(
+                logger.error(
                         "[server][library booksearch] error:",
                         message,
                         error
@@ -342,7 +343,7 @@ app.get("/api/library/:id/:pwd/bookcopies/:recordId", async (req, res) => {
         } catch (error) {
                 const message =
                         error instanceof Error ? error.message : String(error);
-                console.error(
+                logger.error(
                         "[server][library bookcopies] error:",
                         message,
                         error
@@ -368,7 +369,7 @@ app.get("/api/library/seat/campuses", async (_req, res) => {
         } catch (error) {
                 const message =
                         error instanceof Error ? error.message : String(error);
-                console.error(
+                logger.error(
                         "[server][library seat campuses] error:",
                         message,
                         error
@@ -383,5 +384,5 @@ app.get("/api/library/seat/campuses", async (_req, res) => {
 });
 
 app.listen(PORT, () => {
-        console.log(`CSU API 已启动, 端口 :${PORT}`);
+        logger.info(`CSU API 已启动, 端口 :${PORT}`);
 });

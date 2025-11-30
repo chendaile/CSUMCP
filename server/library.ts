@@ -8,6 +8,7 @@ import fetchCookie from "fetch-cookie";
 import { CookieJar } from "tough-cookie";
 import { load as loadHTML, type Cheerio } from "cheerio";
 import type { AnyNode } from "domhandler";
+import { logger } from "../logger.js";
 import type { JwcUser } from "./jwc.js";
 
 type SessionFetch = (
@@ -100,7 +101,7 @@ export interface LibrarySeatCampusResult {
 }
 
 const debug = (...args: unknown[]) => {
-        console.log(new Date().toISOString(), "[library]", ...args);
+        logger.info("[library]", ...args);
 };
 
 const createSessionFetch = (): {

@@ -7,6 +7,7 @@ import fetch, {
 import fetchCookie from "fetch-cookie";
 import { load as loadHTML } from "cheerio";
 import { CookieJar } from "tough-cookie";
+import { logger } from "../logger.js";
 
 type SessionFetch = (
         input: RequestInfo,
@@ -20,7 +21,7 @@ const casLoginURL = `https://ca.csu.edu.cn/authserver/login?service=${encodeURIC
 const aesCharSet = "ABCDEFGHJKMNPQRSTWXYZabcdefhijkmnprstwxyz2345678";
 
 const debug = (...args: unknown[]) => {
-        console.log(new Date().toISOString(), "[auth]", ...args);
+        logger.info("[auth]", ...args);
 };
 
 const createSessionFetch = (): {

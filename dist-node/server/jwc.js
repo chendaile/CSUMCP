@@ -1,5 +1,6 @@
 import { load as loadHTML } from "cheerio";
 import { authenticatedRequest, login } from "./auth.js";
+import { logger } from "../logger.js";
 const JWC_BASE_URL = "http://csujwc.its.csu.edu.cn/jsxsd/";
 const JWC_GRADE_URL = `${JWC_BASE_URL}kscj/yscjcx_list`;
 const JWC_RANK_URL = `${JWC_BASE_URL}kscj/zybm_cx`;
@@ -12,7 +13,7 @@ const JWC_MINOR_PAY_URL = `${JWC_BASE_URL}fxgl/fxxkjf_query`;
 const JWC_BASE_HOST = "http://csujwc.its.csu.edu.cn";
 const JWC_STUDENT_PLAN_URL = `${JWC_BASE_URL}pyfa/pyfa_query`;
 const debug = (...args) => {
-    console.log(new Date().toISOString(), "[jwc]", ...args);
+    logger.info("[jwc]", ...args);
 };
 export const grade = async (user, term = "") => {
     debug("grade start", { id: user.id, term });

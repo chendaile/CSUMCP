@@ -3,11 +3,12 @@ import fetch from "node-fetch";
 import fetchCookie from "fetch-cookie";
 import { load as loadHTML } from "cheerio";
 import { CookieJar } from "tough-cookie";
+import { logger } from "../logger.js";
 const jwcSSOEndpoint = "http://csujwc.its.csu.edu.cn/sso.jsp";
 const casLoginURL = `https://ca.csu.edu.cn/authserver/login?service=${encodeURIComponent(jwcSSOEndpoint)}`;
 const aesCharSet = "ABCDEFGHJKMNPQRSTWXYZabcdefhijkmnprstwxyz2345678";
 const debug = (...args) => {
-    console.log(new Date().toISOString(), "[auth]", ...args);
+    logger.info("[auth]", ...args);
 };
 const createSessionFetch = () => {
     const jar = new CookieJar();

@@ -3,6 +3,7 @@ import fetch from "node-fetch";
 import fetchCookie from "fetch-cookie";
 import { CookieJar } from "tough-cookie";
 import { load as loadHTML } from "cheerio";
+import { logger } from "../logger.js";
 const LIB_SERVICE_URL = "https://lib.csu.edu.cn/system/resource/code/auth/clogin.jsp";
 const OPAC_SERVICE_URL = "https://opac.lib.csu.edu.cn/csu_sso/login_auth/cas/csu/index";
 const casLoginURL = `https://ca.csu.edu.cn/authserver/login?service=${encodeURIComponent(LIB_SERVICE_URL)}`;
@@ -14,7 +15,7 @@ const OPAC_GROUP_ITEMS_URL = "https://opac.lib.csu.edu.cn/find/physical/groupite
 const LIB_SEAT_HOME_URL = "https://libzw.csu.edu.cn/home/web/f_second";
 const LIB_SEAT_AREA_API_PREFIX = "https://libzw.csu.edu.cn/api.php/v3areas/";
 const debug = (...args) => {
-    console.log(new Date().toISOString(), "[library]", ...args);
+    logger.info("[library]", ...args);
 };
 const createSessionFetch = () => {
     const jar = new CookieJar();

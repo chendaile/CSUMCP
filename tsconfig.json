@@ -13,5 +13,5 @@
                 "skipLibCheck": true,
                 "types": ["node"]
         },
-        "include": ["server/**/*.ts", "mcp/**/*.ts", "bin/**/*.ts"]
+        "include": ["server/**/*.ts", "mcp/**/*.ts", "bin/**/*.ts", "logger.ts"]
 }
