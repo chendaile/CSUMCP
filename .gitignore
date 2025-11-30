@@ -26,3 +26,6 @@ dist-ssr
 tmp
 third-party
 .kilocode
+*.tgz
+.kilocode
+.npm-cache

@@ -596,7 +596,7 @@ export const summaryMarkdown = async (user: JwcUser, term = "") => {
         return result;
 };
 
-const parseFilenameFromDisposition = (disposition: string | null) => {
+const _parseFilenameFromDisposition = (disposition: string | null) => {
         if (!disposition) return "";
         const utf8Match = /filename\*=UTF-8''([^;]+)/i.exec(disposition);
         if (utf8Match?.[1]) {

@@ -14,7 +14,6 @@ import {
         searchLibraryBooks,
         fetchBookCopies,
         fetchSeatCampuses,
-        type LibraryBookSearchResult,
 } from "./library.js";
 import { searchBus } from "./bus.js";
 
@@ -301,9 +300,7 @@ app.get("/api/library/:id/:pwd/booksearch", async (req, res) => {
                         StateCode: 1,
                         Error: "",
                         Status: data.status,
-                        Data: (data.parsed || data.body) as
-                                | LibraryBookSearchResult
-                                | string,
+                        Data: (data.parsed || data.body),
                 });
         } catch (error) {
                 const message =

@@ -1,25 +1,21 @@
 {
         "name": "csu-mcp",
         "private": false,
-        "version": "0.1.0",
+        "version": "1.0.0",
         "type": "module",
         "bin": {
-                "csu-mcp-sse": "./mcp/bin-sse.mjs",
-                "csu-api": "./server/bin.mjs",
-                "csu-mcp-stdio": "./mcp/bin-stdio.mjs"
+                "csu-mcp": "./dist-node/bin/csu-mcp.js"
         },
         "scripts": {
-                "start:mcp:http": "node --import tsx/esm mcp/http.ts",
+                "build": "tsc -p tsconfig.json",
+                "start:mcp:sse": "node --import tsx/esm mcp/sse.ts",
                 "start:mcp:stdio": "node --import tsx/esm mcp/stdio.ts",
                 "start:api": "node --import tsx/esm server/index.ts"
         },
         "files": [
                 "package.json",
                 "README.md",
-                "mcp",
-                "server",
-                "tsconfig.mcp.json",
-                "tsconfig.server.json"
+                "dist-node"
         ],
         "dependencies": {
                 "@modelcontextprotocol/sdk": "^0.6.0",

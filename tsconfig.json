@@ -1,9 +1,17 @@
 {
-  "files": [],
-  "references": [
-    { "path": "./tsconfig.frontend.json" },
-    { "path": "./tsconfig.vite.json" },
-    { "path": "./tsconfig.mcp.json" },
-    { "path": "./tsconfig.server.json" }
-  ]
+        "compilerOptions": {
+                "target": "ES2022",
+                "module": "NodeNext",
+                "moduleResolution": "NodeNext",
+                "outDir": "./dist-node",
+                "rootDir": ".",
+                "resolveJsonModule": true,
+                "esModuleInterop": true,
+                "allowSyntheticDefaultImports": true,
+                "declaration": true,
+                "sourceMap": false,
+                "skipLibCheck": true,
+                "types": ["node"]
+        },
+        "include": ["server/**/*.ts", "mcp/**/*.ts", "bin/**/*.ts"]
 }

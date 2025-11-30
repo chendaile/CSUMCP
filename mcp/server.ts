@@ -38,7 +38,7 @@ const toTextResult = (text: string): ToolResult => ({
         content: [{ type: "text", text }],
 });
 
-const usageMarkdown = (docBase: string) => `# CSU MCP 使用手册
+const usageMarkdown = () => `# CSU MCP 使用手册
 ## 主要工具
 - 成绩/排名/课表/等级考试/培养计划/辅修（csu.grade/rank/classes/level_exam/student_plan/minor_info）
 - 学生信息 PDF（csu.student_info，base64）
@@ -561,7 +561,7 @@ export const createMcpServer = (
                                 {
                                         uri: usageResource.uri,
                                         mimeType: usageResource.mimeType,
-                                        text: usageMarkdown(docBaseUrl),
+                                        text: usageMarkdown(),
                                 },
                         ],
                 });
@@ -587,7 +587,7 @@ export const createMcpServer = (
                                         role: "assistant",
                                         content: {
                                                 type: "text",
-                                                text: usageMarkdown(docBaseUrl),
+                                                text: usageMarkdown(),
                                         },
                                 },
                         ],

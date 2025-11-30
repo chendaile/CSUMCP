@@ -6,11 +6,8 @@ import fetch, {
 } from "node-fetch";
 import fetchCookie from "fetch-cookie";
 import { CookieJar } from "tough-cookie";
-import {
-        load as loadHTML,
-        type Cheerio,
-        type Element,
-} from "cheerio";
+import { load as loadHTML, type Cheerio } from "cheerio";
+import type { AnyNode } from "domhandler";
 import type { JwcUser } from "./jwc.js";
 
 type SessionFetch = (
@@ -748,7 +745,7 @@ export interface LibraryDbSearchResult {
         Foreign: LibraryDbEntry[];
 }
 
-const parseDbList = (list: Cheerio<Element>, base: string): LibraryDbEntry[] => {
+const parseDbList = (list: Cheerio<AnyNode>, base: string): LibraryDbEntry[] => {
         const entries: LibraryDbEntry[] = [];
         list.find(".lib-data-body .row").each((_, row) => {
                 const $row = loadHTML(row);
