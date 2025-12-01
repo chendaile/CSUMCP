@@ -24,10 +24,19 @@ npx csu-mcp@latest
 ### 客户端（stdio）配置示例
 
 ```json
-"csu": {
-  "command": "npx",
-  "args": ["-y", "csu-mcp"],
-  "env": {}
+{
+        "servers": {
+                "csu": {
+                        "command": "npx",
+                        "args": ["-y", "csu-mcp@latest"],
+                        "env": {
+                                "CSU_ID": <YOUR_CSU_ID>(OPTINAL but some features need it),
+                                "CSU_PWD": <YOUR_CSU_PWD>(OPTINAL but some features need it),
+                                "PORY": <LOCAL_API_PORT>(OPTINAL),
+                                "API_BASE_URL": <API_URL>(OPTINAL)
+                        }
+                }
+        }
 }
 ```
 
@@ -42,6 +51,13 @@ npm run build   # 生成 dist-node 产物，bin 指向 dist-node/bin/csu-mcp.js
 
 - 所有需要学号/密码的接口都可通过环境变量注入：`CSU_ID`、`CSU_PWD`。若设置这两个变量，URL 中的 `:id/:pwd` 会被忽略。
 - 课表 `TimeInWeek` 以周日为 1 起算（“第一天”是上周日），因此 4 表示周三。
+
+## 能力概览
+
+- 教务：成绩、排名、课表、等级考试、培养计划、辅修信息。
+- 校园卡：账户信息、近期开销流水（含明细 URL，金额换算为元）。
+- 图书馆：电子资源检索、馆藏检索（含详情 URL）、座位校区/楼层信息（seat2 链接）。
+- 校车：班次查询，返回 id、途径站、详情链接，便于跳转查看。
 
 ## 工具列表（MCP）
 

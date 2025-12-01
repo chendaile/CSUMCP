@@ -77,7 +77,7 @@ export interface LibrarySeatCampus {
         Name: string;
         Remaining: number;
         Total: number;
-        SeatApi: string;
+        SeatUrl: string;
         Floors: LibrarySeatFloor[];
 }
 
@@ -408,7 +408,7 @@ const parseSeatCampus = (html: string): LibrarySeatCampusResult => {
                                 Name: name,
                                 Remaining: remaining,
                                 Total: total,
-                                SeatApi: `${LIB_SEAT_AREA_API_PREFIX}${areaId}`,
+                                SeatUrl: `https://libzw.csu.edu.cn/home/web/seat2/area/${areaId}`,
                                 Floors: [],
                         });
                 }
@@ -603,11 +603,11 @@ export const fetchSeatCampuses = async (): Promise<{
                         parsed.Campuses.map(async (campus) => {
                                 try {
                                         const areaIdMatch =
-                                                /\/(\d+)$/.exec(campus.SeatApi);
-                                        const areaId = areaIdMatch
-                                                ? areaIdMatch[1]
-                                                : "";
-                                        const seatPageUrl = `https://libzw.csu.edu.cn/home/web/seat/area/${areaId}`;
+                                                /area\/(\d+)/.exec(
+                                                        campus.SeatUrl
+                                                );
+                                        const areaId = areaIdMatch?.[1] ?? "";
+                                        const seatPageUrl = campus.SeatUrl;
                                         // 先访问座位页面以获取 PHPSESSID 等 cookie
                                         const seatPageResp =
                                                 await sessionFetch(
@@ -622,7 +622,7 @@ export const fetchSeatCampuses = async (): Promise<{
                                                 }
                                         );
                                         const areaResp = await sessionFetch(
-                                                campus.SeatApi,
+                                                `${LIB_SEAT_AREA_API_PREFIX}${areaId}`,
                                                 {
                                                         method: "GET",
                                                         headers: {
@@ -634,10 +634,10 @@ export const fetchSeatCampuses = async (): Promise<{
                                                 }
                                         );
                                         const areaText = await areaResp.text();
-                                        debug(
-                                                "fetchSeatCampuses area resp",
-                                                {
-                                                        api: campus.SeatApi,
+                                       debug(
+                                               "fetchSeatCampuses area resp",
+                                               {
+                                                        api: `${LIB_SEAT_AREA_API_PREFIX}${areaId}`,
                                                         status: areaResp.status,
                                                         bodyPreview:
                                                                 areaText.slice(
@@ -667,25 +667,25 @@ export const fetchSeatCampuses = async (): Promise<{
                                                                 f.UnavailableSpace ??
                                                                         0
                                                         ),
-                                                        Remaining: Math.max(
-                                                                0,
-                                                                Number(
-                                                                        f.TotalCount ??
-                                                                                0
-                                                                ) -
-                                                                        Number(
-                                                                                f.UnavailableSpace ??
-                                                                                        0
-                                                                        )
-                                                        ),
-                                                        SeatUrl: `https://libzw.csu.edu.cn/home/web/seat/area/${f.id}`,
-                                                })
-                                        );
+                                                       Remaining: Math.max(
+                                                               0,
+                                                               Number(
+                                                                       f.TotalCount ??
+                                                                               0
+                                                               ) -
+                                                                       Number(
+                                                                               f.UnavailableSpace ??
+                                                                                       0
+                                                                       )
+                                                       ),
+                                                        SeatUrl: `https://libzw.csu.edu.cn/home/web/seat2/area/${f.id}`,
+                                               })
+                                       );
                                         return { ...campus, Floors: floors };
                                 } catch (e) {
                                         debug(
                                                 "fetchSeatCampuses area parse error",
-                                                campus.SeatApi,
+                                                "seat area",
                                                 e
                                         );
                                         return campus;

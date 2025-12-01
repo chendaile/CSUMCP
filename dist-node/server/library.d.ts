@@ -48,7 +48,7 @@ export interface LibrarySeatCampus {
     Name: string;
     Remaining: number;
     Total: number;
-    SeatApi: string;
+    SeatUrl: string;
     Floors: LibrarySeatFloor[];
 }
 export interface LibrarySeatFloor {

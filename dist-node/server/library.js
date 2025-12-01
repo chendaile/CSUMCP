@@ -260,7 +260,7 @@ const parseSeatCampus = (html) => {
                 Name: name,
                 Remaining: remaining,
                 Total: total,
-                SeatApi: `${LIB_SEAT_AREA_API_PREFIX}${areaId}`,
+                SeatUrl: `https://libzw.csu.edu.cn/home/web/seat2/area/${areaId}`,
                 Floors: [],
             });
         }
@@ -440,18 +440,16 @@ export const fetchSeatCampuses = async () => {
         // 逐个获取楼层信息并填充
         parsed.Campuses = await Promise.all(parsed.Campuses.map(async (campus) => {
             try {
-                const areaIdMatch = /\/(\d+)$/.exec(campus.SeatApi);
-                const areaId = areaIdMatch
-                    ? areaIdMatch[1]
-                    : "";
-                const seatPageUrl = `https://libzw.csu.edu.cn/home/web/seat/area/${areaId}`;
+                const areaIdMatch = /area\/(\d+)/.exec(campus.SeatUrl);
+                const areaId = areaIdMatch?.[1] ?? "";
+                const seatPageUrl = campus.SeatUrl;
                 // 先访问座位页面以获取 PHPSESSID 等 cookie
                 const seatPageResp = await sessionFetch(seatPageUrl, { method: "GET" });
                 debug("fetchSeatCampuses seat page", {
                     url: seatPageResp.url,
                     status: seatPageResp.status,
                 });
-                const areaResp = await sessionFetch(campus.SeatApi, {
+                const areaResp = await sessionFetch(`${LIB_SEAT_AREA_API_PREFIX}${areaId}`, {
                     method: "GET",
                     headers: {
                         accept: "application/json, text/javascript, */*; q=0.01",
@@ -461,7 +459,7 @@ export const fetchSeatCampuses = async () => {
                 });
                 const areaText = await areaResp.text();
                 debug("fetchSeatCampuses area resp", {
-                    api: campus.SeatApi,
+                    api: `${LIB_SEAT_AREA_API_PREFIX}${areaId}`,
                     status: areaResp.status,
                     bodyPreview: areaText.slice(0, 200),
                 });
@@ -481,12 +479,12 @@ export const fetchSeatCampuses = async () => {
                         0) -
                         Number(f.UnavailableSpace ??
                             0)),
-                    SeatUrl: `https://libzw.csu.edu.cn/home/web/seat/area/${f.id}`,
+                    SeatUrl: `https://libzw.csu.edu.cn/home/web/seat2/area/${f.id}`,
                 }));
                 return { ...campus, Floors: floors };
             }
             catch (e) {
-                debug("fetchSeatCampuses area parse error", campus.SeatApi, e);
+                debug("fetchSeatCampuses area parse error", "seat area", e);
                 return campus;
             }
         }));
