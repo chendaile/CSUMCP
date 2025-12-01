@@ -1,7 +1,5 @@
-import { type RequestInfo, type RequestInit, type Response } from "node-fetch";
-import { CookieJar } from "tough-cookie";
 import type { JwcUser } from "./jwc.js";
-type SessionFetch = (input: RequestInfo, init?: RequestInit) => Promise<Response>;
+import { type SessionFetch } from "./auth.js";
 export interface LibraryBookItem {
     RecordId: number;
     Title: string;
@@ -18,10 +16,12 @@ export interface LibraryBookItem {
     Subjects: string;
     Abstract: string;
     Picture: string;
+    url: string;
 }
 export interface LibraryBookSearchResult {
     Total: number;
     Items: LibraryBookItem[];
+    url?: string;
 }
 export interface LibraryBookItemCopy {
     ItemId: number;
@@ -42,6 +42,7 @@ export interface LibraryBookItemCopy {
 export interface LibraryBookItemCopiesResult {
     Total: number;
     Items: LibraryBookItemCopy[];
+    url?: string;
 }
 export interface LibrarySeatCampus {
     Name: string;
@@ -63,22 +64,24 @@ export interface LibrarySeatCampusResult {
 }
 export declare const loginLibrary: (username: string, password: string) => Promise<{
     sessionFetch: SessionFetch;
-    jar: CookieJar;
+    jar: import("tough-cookie").CookieJar;
 }>;
 export declare const loginLibraryOpac: (username: string, password: string) => Promise<{
     sessionFetch: SessionFetch;
-    jar: CookieJar;
+    jar: import("tough-cookie").CookieJar;
 }>;
-export declare const authenticatedLibraryRequest: (username: string, password: string, method: string, url: string, body: URLSearchParams | undefined) => Promise<Response>;
-export declare const searchLibraryBooks: (user: JwcUser, kw: string) => Promise<{
+export declare const authenticatedLibraryRequest: (username: string, password: string, method: string, url: string, body: URLSearchParams | undefined) => Promise<import("node-fetch").Response>;
+export declare const searchLibraryBooks: (_user: JwcUser, kw: string) => Promise<{
     status: number;
     body: string;
     parsed: LibraryBookSearchResult;
+    url: string;
 }>;
-export declare const fetchBookCopies: (user: JwcUser, recordId: string) => Promise<{
+export declare const fetchBookCopies: (_user: JwcUser, recordId: string) => Promise<{
     status: number;
     body: string;
     parsed: LibraryBookItemCopiesResult;
+    url: string;
 }>;
 export declare const fetchSeatCampuses: () => Promise<{
     status: number;
@@ -96,4 +99,3 @@ export interface LibraryDbSearchResult {
     Foreign: LibraryDbEntry[];
 }
 export declare const searchLibraryDb: (elecName: string) => Promise<LibraryDbSearchResult>;
-export {};

@@ -45,12 +45,13 @@ npm run build   # 生成 dist-node 产物，bin 指向 dist-node/bin/csu-mcp.js
 - `csu.rank`：专业排名
 - `csu.classes`：课表（term，week；week=0 为全周）
 - `csu.level_exam`：等级考试
-- `csu.student_info`：学生信息 PDF（base64）
 - `csu.student_plan`：培养计划
 - `csu.minor_info`：辅修报名与缴费
-- `csu.summary`：成绩 Markdown 汇总（抓取全部学期）
 - `csu.library_db_search`：电子资源检索
 - `csu.library_book_search`：馆藏检索
-- `csu.library_book_copies`：复本/借阅信息
 - `csu.library_seat_campuses`：座位校区列表
+- `csu.ecard_card`：校园卡信息（余额等）
+- `csu.ecard_turnover`：校园卡流水（支持日期/金额范围筛选，返回简化字段与明细 URL）
 - `csu.bus`：校车查询（date，crs01/02 途径站）
+
+说明：多数接口会返回可直接访问的明细 URL（如图书详情、校车班次详情、校园卡流水等），方便在外部工具中二次跳转或扩展操作。

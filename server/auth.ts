@@ -9,7 +9,7 @@ import { load as loadHTML } from "cheerio";
 import { CookieJar } from "tough-cookie";
 import { logger } from "../logger.js";
 
-type SessionFetch = (
+export type SessionFetch = (
         input: RequestInfo,
         init?: RequestInit
 ) => Promise<Response>;
@@ -24,7 +24,7 @@ const debug = (...args: unknown[]) => {
         logger.info("[auth]", ...args);
 };
 
-const createSessionFetch = (): {
+export const createSessionFetch = (): {
         sessionFetch: SessionFetch;
         jar: CookieJar;
 } => {
@@ -37,7 +37,7 @@ const createSessionFetch = (): {
         return { sessionFetch, jar };
 };
 
-const randomString = (length: number) => {
+export const randomString = (length: number) => {
         if (length <= 0) return "";
         let out = "";
         for (let i = 0; i < length; i += 1) {
@@ -47,13 +47,13 @@ const randomString = (length: number) => {
         return out;
 };
 
-const pkcs7Pad = (buffer: Buffer, blockSize = 16) => {
+export const pkcs7Pad = (buffer: Buffer, blockSize = 16) => {
         const padding = blockSize - (buffer.length % blockSize);
         const pad = Buffer.alloc(padding, padding);
         return Buffer.concat([buffer, pad]);
 };
 
-const encryptPassword = (password: string, salt: string) => {
+export const encryptPassword = (password: string, salt: string) => {
         if (!salt) throw new Error("missing salt");
         const prefix = randomString(64);
         const iv = randomString(16);

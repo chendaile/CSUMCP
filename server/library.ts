@@ -1,20 +1,12 @@
-import crypto from "crypto";
-import fetch, {
-        type RequestInfo,
-        type RequestInit,
-        type Response,
-} from "node-fetch";
-import fetchCookie from "fetch-cookie";
-import { CookieJar } from "tough-cookie";
 import { load as loadHTML, type Cheerio } from "cheerio";
 import type { AnyNode } from "domhandler";
 import { logger } from "../logger.js";
 import type { JwcUser } from "./jwc.js";
-
-type SessionFetch = (
-        input: RequestInfo,
-        init?: RequestInit
-) => Promise<Response>;
+import {
+        createSessionFetch,
+        encryptPassword,
+        type SessionFetch,
+} from "./auth.js";
 
 const LIB_SERVICE_URL =
         "https://lib.csu.edu.cn/system/resource/code/auth/clogin.jsp";
@@ -26,7 +18,6 @@ const casLoginURL = `https://ca.csu.edu.cn/authserver/login?service=${encodeURIC
 const opacCasLoginURL = `https://ca.csu.edu.cn/authserver/login?service=${encodeURIComponent(
         OPAC_SERVICE_URL
 )}`;
-const aesCharSet = "ABCDEFGHJKMNPQRSTWXYZabcdefhijkmnprstwxyz2345678";
 const LIB_DB_SEARCH_URL = "https://libdb.csu.edu.cn/accessData";
 const OPAC_UNIFY_SEARCH_URL =
         "https://opac.lib.csu.edu.cn/find/unify/search";
@@ -50,11 +41,13 @@ export interface LibraryBookItem {
         Subjects: string;
         Abstract: string;
         Picture: string;
+        url: string;
 }
 
 export interface LibraryBookSearchResult {
         Total: number;
         Items: LibraryBookItem[];
+        url?: string;
 }
 
 export interface LibraryBookItemCopy {
@@ -77,6 +70,7 @@ export interface LibraryBookItemCopy {
 export interface LibraryBookItemCopiesResult {
         Total: number;
         Items: LibraryBookItemCopy[];
+        url?: string;
 }
 
 export interface LibrarySeatCampus {
@@ -102,51 +96,6 @@ export interface LibrarySeatCampusResult {
 
 const debug = (...args: unknown[]) => {
         logger.info("[library]", ...args);
-};
-
-const createSessionFetch = (): {
-        sessionFetch: SessionFetch;
-        jar: CookieJar;
-} => {
-        const jar = new CookieJar();
-        const sessionFetch = fetchCookie(
-                fetch as unknown as SessionFetch,
-                jar
-        ) as SessionFetch;
-        debug("session created with empty cookie jar");
-        return { sessionFetch, jar };
-};
-
-const randomString = (length: number) => {
-        if (length <= 0) return "";
-        let out = "";
-        for (let i = 0; i < length; i += 1) {
-                const idx = crypto.randomInt(0, aesCharSet.length);
-                out += aesCharSet[idx];
-        }
-        return out;
-};
-
-const pkcs7Pad = (buffer: Buffer, blockSize = 16) => {
-        const padding = blockSize - (buffer.length % blockSize);
-        const pad = Buffer.alloc(padding, padding);
-        return Buffer.concat([buffer, pad]);
-};
-
-const encryptPassword = (password: string, salt: string) => {
-        if (!salt) throw new Error("missing salt");
-        const prefix = randomString(64);
-        const iv = randomString(16);
-        const plain = pkcs7Pad(Buffer.from(prefix + password, "utf8"), 16);
-
-        const cipher = crypto.createCipheriv(
-                "aes-128-cbc",
-                Buffer.from(salt, "utf8"),
-                Buffer.from(iv, "utf8")
-        );
-        cipher.setAutoPadding(false);
-        const encrypted = Buffer.concat([cipher.update(plain), cipher.final()]);
-        return encrypted.toString("base64");
 };
 
 export const loginLibrary = async (username: string, password: string) => {
@@ -380,23 +329,31 @@ const parseBookSearch = (raw: any): LibraryBookSearchResult => {
         const list = Array.isArray(data.searchResult)
                 ? data.searchResult
                 : [];
-        const items: LibraryBookItem[] = list.map((row: any) => ({
-                RecordId: Number(row.recordId ?? 0),
-                Title: row.title ?? "",
-                Author: row.author ?? "",
-                Publisher: row.publisher ?? "",
-                ISBNs: toStringArray(row.isbns),
-                PublishYear: row.publishYear ?? "",
-                CallNo: toStringArray(row.callNo),
-                DocName: row.docName ?? "",
-                PhysicalCount: Number(row.physicalCount ?? 0),
-                OnShelfCount: Number(row.onShelfCountI ?? 0),
-                Language: row.langCode ?? "",
-                Country: row.countryCode ?? "",
-                Subjects: row.subjectWord ?? "",
-                Abstract: row.adstract ?? row.ddAbstract ?? "",
-                Picture: row.pic ?? "",
-        }));
+        const items: LibraryBookItem[] = list.map((row: any) => {
+                const recordId = Number(row.recordId ?? 0);
+                const url =
+                        recordId > 0
+                                ? `https://opac.lib.csu.edu.cn/#/searchList/bookDetails/${recordId}`
+                                : "";
+                return {
+                        RecordId: recordId,
+                        Title: row.title ?? "",
+                        Author: row.author ?? "",
+                        Publisher: row.publisher ?? "",
+                        ISBNs: toStringArray(row.isbns),
+                        PublishYear: row.publishYear ?? "",
+                        CallNo: toStringArray(row.callNo),
+                        DocName: row.docName ?? "",
+                        PhysicalCount: Number(row.physicalCount ?? 0),
+                        OnShelfCount: Number(row.onShelfCountI ?? 0),
+                        Language: row.langCode ?? "",
+                        Country: row.countryCode ?? "",
+                        Subjects: row.subjectWord ?? "",
+                        Abstract: row.adstract ?? row.ddAbstract ?? "",
+                        Picture: row.pic ?? "",
+                        url,
+                };
+        });
         return {
                 Total: Number(data.numFound ?? items.length ?? 0),
                 Items: items,
@@ -482,8 +439,8 @@ export const authenticatedLibraryRequest = async (
         return resp;
 };
 
-export const searchLibraryBooks = async (user: JwcUser, kw: string) => {
-        debug("searchLibraryBooks start", { id: user.id, kw });
+export const searchLibraryBooks = async (_user: JwcUser, kw: string) => {
+        debug("searchLibraryBooks start", { kw });
         const payload = {
                 docCode: [null],
                 searchFieldContent: kw,
@@ -521,7 +478,7 @@ export const searchLibraryBooks = async (user: JwcUser, kw: string) => {
                 customSub0: [],
                 indexSearch: 1,
         };
-        const { sessionFetch } = await loginLibraryOpac(user.id, user.pwd);
+        const { sessionFetch } = createSessionFetch();
         debug("searchLibraryBooks payload", payload);
         const resp = await sessionFetch(OPAC_UNIFY_SEARCH_URL, {
                 method: "POST",
@@ -538,6 +495,9 @@ export const searchLibraryBooks = async (user: JwcUser, kw: string) => {
                 body: JSON.stringify(payload),
         });
         const text = await resp.text();
+        const searchUrl = `https://opac.lib.csu.edu.cn/#/searchList?keyWord=${encodeURIComponent(
+                kw
+        )}`;
         debug("searchLibraryBooks response", {
                 status: resp.status,
                 url: resp.url,
@@ -550,7 +510,7 @@ export const searchLibraryBooks = async (user: JwcUser, kw: string) => {
         try {
                 const json = JSON.parse(text);
                 if (json?.success === true) {
-                        parsed = parseBookSearch(json);
+                        parsed = { ...parseBookSearch(json), url: searchUrl };
                 } else {
                         debug("searchLibraryBooks response not success", {
                                 success: json?.success,
@@ -561,11 +521,11 @@ export const searchLibraryBooks = async (user: JwcUser, kw: string) => {
         } catch (e) {
                 debug("searchLibraryBooks parse error", e);
         }
-        return { status: resp.status, body: text, parsed };
+        return { status: resp.status, body: text, parsed, url: searchUrl };
 };
 
-export const fetchBookCopies = async (user: JwcUser, recordId: string) => {
-        debug("fetchBookCopies start", { id: user.id, recordId });
+export const fetchBookCopies = async (_user: JwcUser, recordId: string) => {
+        debug("fetchBookCopies start", { recordId });
         const payload = {
                 page: 1,
                 rows: 10,
@@ -574,7 +534,7 @@ export const fetchBookCopies = async (user: JwcUser, recordId: string) => {
                 isUnify: true,
                 sortType: 0,
         };
-        const { sessionFetch } = await loginLibraryOpac(user.id, user.pwd);
+        const { sessionFetch } = createSessionFetch();
         debug("fetchBookCopies payload", payload);
         const resp = await sessionFetch(OPAC_GROUP_ITEMS_URL, {
                 method: "POST",
@@ -598,11 +558,15 @@ export const fetchBookCopies = async (user: JwcUser, recordId: string) => {
                 bodyLen: text.length,
         });
         debug("fetchBookCopies raw body", text);
+        const detailsUrl =
+                recordId && String(recordId)
+                        ? `https://opac.lib.csu.edu.cn/#/searchList/bookDetails/${recordId}`
+                        : "";
         let parsed: LibraryBookItemCopiesResult | undefined;
         try {
                 const json = JSON.parse(text);
                 if (json?.success === true) {
-                        parsed = parseBookCopies(json);
+                        parsed = { ...parseBookCopies(json), url: detailsUrl };
                 } else {
                         debug("fetchBookCopies response not success", {
                                 success: json?.success,
@@ -613,7 +577,7 @@ export const fetchBookCopies = async (user: JwcUser, recordId: string) => {
         } catch (e) {
                 debug("fetchBookCopies parse error", e);
         }
-        return { status: resp.status, body: text, parsed };
+        return { status: resp.status, body: text, parsed, url: detailsUrl };
 };
 
 export const fetchSeatCampuses = async (): Promise<{

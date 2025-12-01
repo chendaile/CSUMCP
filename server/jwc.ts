@@ -92,13 +92,58 @@ export interface StudentPlanEntry {
         AdjustReason: string;
 }
 
+export interface StudentCard {
+        department: string;
+        major: string;
+        duration: string;
+        className: string;
+        studentId: string;
+        name: string;
+        gender: string;
+        namePinyin: string;
+        birthday: string;
+        maritalStatus: string;
+        phone: string;
+        majorDirection: string;
+        politicalStatus: string;
+        birthplace: string;
+        admissionMajor: string;
+        ethnicity: string;
+        studentType: string;
+        educationLevel: string;
+        admissionDate: string;
+        address: string;
+        arrivalStation: string;
+        postalCode: string;
+        idCard: string;
+        examId: string;
+        studyResume: { period: string; organization: string; education: string }[];
+        familyMembers: {
+                name: string;
+                relation: string;
+                workplace: string;
+                phone: string;
+        }[];
+        changes: {
+                type: string;
+                reason: string;
+                date: string;
+                originalDepartment: string;
+                originalMajor: string;
+                originalGrade: string;
+        }[];
+        disciplineCategory: string;
+        graduationCertificate: string;
+        bachelorCertificate: string;
+        printDate: string;
+}
+
 const JWC_BASE_URL = "http://csujwc.its.csu.edu.cn/jsxsd/";
 const JWC_GRADE_URL = `${JWC_BASE_URL}kscj/yscjcx_list`;
 const JWC_RANK_URL = `${JWC_BASE_URL}kscj/zybm_cx`;
 const JWC_CLASS_URL = `${JWC_BASE_URL}xskb/xskb_list.do`;
 const JWC_LEVEL_EXAM_URL = `${JWC_BASE_URL}kscj/djkscj_list`;
 const JWC_STUDENT_INFO_PAGE_URL = `${JWC_BASE_URL}grxx/xsxx`;
-const JWC_STUDENT_INFO_EXPORT_URL = `${JWC_BASE_URL}grxx/xsxx_print.do`;
 const JWC_MINOR_REG_URL = `${JWC_BASE_URL}fxgl/fxbmxx`;
 const JWC_MINOR_PAY_URL = `${JWC_BASE_URL}fxgl/fxxkjf_query`;
 const JWC_BASE_HOST = "http://csujwc.its.csu.edu.cn";
@@ -459,144 +504,6 @@ export const studentPlan = async (user: JwcUser) => {
         return plans;
 };
 
-export const summaryMarkdown = async (user: JwcUser, term = "") => {
-        debug("summaryMarkdown start", { id: user.id, term });
-        const md: string[] = [];
-        md.push("# 教务信息汇总");
-        if (term) {
-                md.push(`- 成绩学期: ${term}`);
-        }
-        md.push("");
-
-        const [grades, ranks, levelExams, minor, plans] = await Promise.all([
-                grade(user, term),
-                rank(user),
-                levelExam(user),
-                minorInfo(user),
-                studentPlan(user),
-        ]);
-
-        // 成绩
-        md.push("## 成绩");
-        if (grades.length === 0) {
-                md.push("暂无成绩数据。");
-        } else {
-                md.push("| 学期 | 课程 | 成绩 | 学分 | 课程性质 | 课程属性 |");
-                md.push("| --- | --- | --- | --- | --- | --- |");
-                grades.forEach((g) =>
-                        md.push(
-                                `| ${g.GottenTerm} | ${g.ClassName} | ${g.FinalGrade} | ${g.Credit} | ${g.ClassNature} | ${g.ClassAttribute} |`
-                        )
-                );
-        }
-        md.push("");
-
-        // 排名
-        md.push("## 排名");
-        if (ranks.length === 0) {
-                md.push("暂无排名数据。");
-        } else {
-                md.push("| 学期 | 总评 | 班级排名 | 平均分 |");
-                md.push("| --- | --- | --- | --- |");
-                ranks.forEach((r) =>
-                        md.push(
-                                `| ${r.Term} | ${r.TotalScore} | ${r.ClassRank} | ${r.AverScore} |`
-                        )
-                );
-        }
-        md.push("");
-
-        // 等级考试
-        md.push("## 等级考试");
-        if (levelExams.length === 0) {
-                md.push("暂无等级考试数据。");
-        } else {
-                md.push(
-                        "| 考试 | 笔试分 | 机试分 | 总分 | 笔试等级 | 机试等级 | 总等级 | 考试日期 |"
-                );
-                md.push(
-                        "| --- | --- | --- | --- | --- | --- | --- | --- |"
-                );
-                levelExams.forEach((e) =>
-                        md.push(
-                                `| ${e.Course} | ${e.WrittenScore} | ${e.ComputerScore} | ${e.TotalScore} | ${e.WrittenLevel} | ${e.ComputerLevel} | ${e.TotalLevel} | ${e.ExamDate} |`
-                        )
-                );
-        }
-        md.push("");
-
-        // 辅修报名与缴费
-        md.push("## 辅修报名");
-        if (minor.registrations.length === 0) {
-                md.push("暂无辅修报名信息。");
-        } else {
-                minor.registrations.forEach((reg, idx) => {
-                        md.push(
-                                `### 辅修报名 ${idx + 1}: ${reg.Major} (${reg.Department})`
-                        );
-                        md.push(
-                                `- 类型: ${reg.Type}  状态: ${reg.Status}`
-                        );
-                        if (reg.Plan.length === 0) {
-                                md.push("- 培养方案: 暂无数据");
-                        } else {
-                                md.push(
-                                        "| 序号 | 开课学期 | 课程编号 | 课程名称 | 学分 | 学时 | 考核方式 | 课程属性 | 是否考试 |"
-                                );
-                                md.push(
-                                        "| --- | --- | --- | --- | --- | --- | --- | --- | --- |"
-                                );
-                                reg.Plan.forEach((p) =>
-                                        md.push(
-                                                `| ${p.Index} | ${p.Term} | ${p.CourseId} | ${p.CourseName} | ${p.Credit} | ${p.Hours} | ${p.ExamType} | ${p.CourseAttr} | ${p.IsExam} |`
-                                        )
-                                );
-                        }
-                        md.push("");
-                });
-        }
-
-        md.push("## 辅修选课缴费");
-        if (minor.payments.length === 0) {
-                md.push("暂无辅修缴费数据。");
-        } else {
-                md.push(
-                        "| 序号 | 课程编号 | 课程名称 | 开课单位 | 上课班级 | 上课地点 | 上课时间 | 教师 | 学分 | 学时 | 金额 | 是否缴费 |"
-                );
-                md.push(
-                        "| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |"
-                );
-                minor.payments.forEach((p) =>
-                        md.push(
-                                `| ${p.Index} | ${p.CourseId} | ${p.CourseName} | ${p.Department} | ${p.Class} | ${p.Place} | ${p.Time} | ${p.Teacher} | ${p.Credit} | ${p.Hours} | ${p.Fee} | ${p.Paid} |`
-                        )
-                );
-        }
-        md.push("");
-
-        // 执行计划 / 培养方案
-        md.push("## 执行计划（培养方案）");
-        if (plans.length === 0) {
-                md.push("暂无执行计划数据。");
-        } else {
-                md.push(
-                        "| 序号 | 开课学期 | 课程编号 | 课程名称 | 学分 | 总学时 | 考核方式 | 课程属性 | 是否考试 | 微调原因 |"
-                );
-                md.push(
-                        "| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |"
-                );
-                plans.forEach((p) =>
-                        md.push(
-                                `| ${p.Index} | ${p.Term} | ${p.CourseId} | ${p.CourseName} | ${p.Credit} | ${p.Hours} | ${p.ExamType} | ${p.CourseAttr} | ${p.IsExam} | ${p.AdjustReason} |`
-                        )
-                );
-        }
-
-        const result = md.join("\n");
-        debug("summaryMarkdown generated length", result.length);
-        return result;
-};
-
 const _parseFilenameFromDisposition = (disposition: string | null) => {
         if (!disposition) return "";
         const utf8Match = /filename\*=UTF-8''([^;]+)/i.exec(disposition);
@@ -628,46 +535,201 @@ export const studentInfo = async (user: JwcUser) => {
 
         const { sessionFetch } = await login(user.id, user.pwd);
 
-        // 预热学籍信息页面以获取必要的上下文
-        const preflight = await sessionFetch(JWC_STUDENT_INFO_PAGE_URL, {
+        const resp = await sessionFetch(JWC_STUDENT_INFO_PAGE_URL, {
                 method: "GET",
         });
-        debug(
-                "studentInfo preflight status",
-                preflight.status,
-                "url",
-                preflight.url
+        debug("studentInfo page status", resp.status, "url", resp.url);
+        const html = await resp.text();
+        const $ = loadHTML(html);
+        const table = $("#xjkpTable");
+        if (!table.length) {
+                debug(
+                        "studentInfo page missing expected table",
+                        html.substring(0, 200)
+                );
+                throw new Error("无法找到学籍卡片信息");
+        }
+
+        const normalize = (text: string) =>
+                text.replace(/\u00a0/g, " ").replace(/\s+/g, " ").trim();
+
+        const rows = table
+                .find("tr")
+                .toArray()
+                .map((tr) =>
+                        $(tr)
+                                .find("td")
+                                .toArray()
+                                .map((td) => normalize($(td).text()))
+                );
+
+        const findRow = (matcher: (cells: string[]) => boolean) =>
+                rows.find((cells) => matcher(cells)) ?? [];
+        const findRowIndex = (matcher: (cells: string[]) => boolean) =>
+                rows.findIndex((cells) => matcher(cells));
+
+        const joinedRow = (cells: string[]) =>
+                normalize(cells.join(" ").replace(/\s+/g, " "));
+        const condensedRow = (cells: string[]) =>
+                normalize(cells.join("")).replace(/\s+/g, "");
+
+        const firstNonEmpty = (values: string[]) =>
+                values.find((v) => v !== undefined && v !== "") ?? "";
+
+        const baseInfoRow = findRow((cells) =>
+                cells.some((c) => c.includes("院系："))
+        );
+        const baseInfoText = joinedRow(baseInfoRow);
+        const matchDept = /院系：([^ \u3000]+)/.exec(baseInfoText);
+        const matchMajor = /专业：([^ \u3000]+)/.exec(baseInfoText);
+        const matchDuration = /学制：([^ \u3000]+)/.exec(baseInfoText);
+        const matchClass = /班级：([^ \u3000]+)/.exec(baseInfoText);
+        const matchSid = /学号：([^ \u3000]+)/.exec(baseInfoText);
+
+        const nameRow = findRow((cells) => cells[0] === "姓名");
+        const birthRow = findRow((cells) => cells[0] === "出生日期");
+        const directionRow = findRow((cells) => cells[0] === "专业方向");
+        const birthplaceRow = findRow((cells) => cells[0] === "生源地");
+        const admissionMajorRow = findRow((cells) => cells[0] === "招生专业");
+        const typeRow = findRow((cells) => cells[0] === "学生类别");
+        const addressRow = findRow((cells) => cells[0] === "家庭现住址");
+        const postalRow = findRow((cells) => cells[0] === "邮政编码");
+        const certificateRow = findRow((cells) =>
+                cells[0]?.includes("毕(结)业证书号")
+        );
+        const disciplineRow = findRow((cells) =>
+                cells.some((c) => c.includes("学科门类"))
+        );
+        const printDateRow = findRow((cells) =>
+                cells.some((c) => c.includes("打印日期"))
         );
 
-        const resp = await sessionFetch(JWC_STUDENT_INFO_EXPORT_URL, {
-                method: "POST",
-                headers: {
-                        "content-type": "application/x-www-form-urlencoded",
-                },
-                body: new URLSearchParams(),
-        });
-        debug("studentInfo export status", resp.status, "url", resp.url);
-        const contentType =
-                resp.headers.get("content-type") || "application/msexcel";
-
-        const buffer = await resp.arrayBuffer();
-        // 为避免中文编码乱码，强制使用英文文件名
-        const filename = `${user.id}-student-info.xls`;
-
-        debug(
-                "studentInfo file ready",
-                "size",
-                buffer.byteLength,
-                "filename",
-                filename
-        );
-
-        return {
-                buffer: Buffer.from(buffer),
-                filename,
-                contentType,
-                contentDisposition: `attachment; filename="${filename}"`,
+        const info: StudentCard = {
+                department: matchDept?.[1] ?? "",
+                major: matchMajor?.[1] ?? "",
+                duration: matchDuration?.[1] ?? "",
+                className: matchClass?.[1] ?? "",
+                studentId: matchSid?.[1] ?? "",
+                name: nameRow[1] ?? "",
+                gender: nameRow[3] ?? "",
+                namePinyin: nameRow[5] ?? "",
+                birthday: birthRow[1] ?? "",
+                maritalStatus: birthRow[3] ?? "",
+                phone: birthRow[5] ?? "",
+                majorDirection: directionRow[1] ?? "",
+                politicalStatus:
+                        directionRow[3] ??
+                        directionRow[4] ??
+                        directionRow[directionRow.length - 1] ??
+                        "",
+                birthplace: birthplaceRow.slice(1).join("") ?? "",
+                admissionMajor: admissionMajorRow[1] ?? "",
+                ethnicity:
+                        admissionMajorRow[admissionMajorRow.length - 1] ?? "",
+                studentType: typeRow[1] ?? "",
+                educationLevel: typeRow[3] ?? typeRow[4] ?? "",
+                admissionDate: typeRow[typeRow.length - 1] ?? "",
+                address: firstNonEmpty(addressRow.slice(1, addressRow.length - 1)),
+                arrivalStation:
+                        addressRow[addressRow.length - 1] ??
+                        addressRow[addressRow.length - 2] ??
+                        "",
+                postalCode: postalRow[1] ?? "",
+                idCard: postalRow[3] ?? "",
+                examId: postalRow[postalRow.length - 1] ?? "",
+                studyResume: [],
+                familyMembers: [],
+                changes: [],
+                disciplineCategory:
+                        disciplineRow
+                                .find((c) => c.includes("学科门类"))
+                                ?.replace(/^学科门类：?/, "") ?? "",
+                graduationCertificate: certificateRow[1] ?? "",
+                bachelorCertificate:
+                        certificateRow[certificateRow.length - 1] ?? "",
+                printDate:
+                        printDateRow.find((c) => c.includes("打印日期")) ?? "",
         };
+
+        const resumeHeaderIdx = findRowIndex((cells) =>
+                cells.join("").includes("学习及工作简历")
+        );
+        const familyHeaderIdx = findRowIndex((cells) =>
+                cells.join("").includes("家庭成员情况")
+        );
+        const changeHeaderIdx = findRowIndex((cells) =>
+                cells.join("").includes("学籍变动情况")
+        );
+        const flowHeaderIdx = findRowIndex((cells) =>
+                cells.join("").includes("大类分流")
+        );
+
+        const sectionRows = (startIdx: number, endIdx: number) => {
+                if (startIdx < 0) return [] as string[][];
+                return rows.slice(
+                        startIdx + 2,
+                        endIdx > -1 ? endIdx : undefined
+                );
+        };
+
+        const findSection = (startMatcher: string, endMatcher: string) => {
+                const startIdx = findRowIndex((cells) =>
+                        condensedRow(cells).includes(startMatcher)
+                );
+                const endIdx = rows.findIndex(
+                        (cells, idx) =>
+                                idx > startIdx &&
+                                condensedRow(cells).includes(endMatcher)
+                );
+                return sectionRows(startIdx, endIdx);
+        };
+
+        const cleanResumeRows = findSection(
+                "学习及工作简历",
+                "家庭成员情况"
+        );
+        cleanResumeRows.forEach((r) => {
+                const parts = r.filter(Boolean);
+                if (parts.length === 0) return;
+                info.studyResume.push({
+                        period: parts[0] ?? "",
+                        organization: parts[1] ?? "",
+                        education: parts[2] ?? "",
+                });
+        });
+
+        const cleanFamilyRows = findSection("家庭成员情况", "学籍变动情况");
+        cleanFamilyRows.forEach((r) => {
+                const parts = r.filter(Boolean);
+                if (parts.length === 0) return;
+                info.familyMembers.push({
+                        name: parts[0] ?? "",
+                        relation: parts[1] ?? "",
+                        workplace: parts[2] ?? "",
+                        phone: parts[3] ?? "",
+                });
+        });
+
+        const cleanChangeRows = findSection("学籍变动情况", "大类分流");
+        cleanChangeRows.forEach((r) => {
+                const parts = r.filter(Boolean);
+                if (parts.length === 0) return;
+                info.changes.push({
+                        type: parts[0] ?? "",
+                        reason: parts[1] ?? "",
+                        date: parts[2] ?? "",
+                        originalDepartment: parts[3] ?? "",
+                        originalMajor: parts[4] ?? "",
+                        originalGrade: parts[5] ?? "",
+                });
+        });
+
+        debug("studentInfo parsed", {
+                studyResume: info.studyResume.length,
+                family: info.familyMembers.length,
+                changes: info.changes.length,
+        });
+        return info;
 };
 
 export const minorInfo = async (user: JwcUser) => {

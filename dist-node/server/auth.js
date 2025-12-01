@@ -10,13 +10,13 @@ const aesCharSet = "ABCDEFGHJKMNPQRSTWXYZabcdefhijkmnprstwxyz2345678";
 const debug = (...args) => {
     logger.info("[auth]", ...args);
 };
-const createSessionFetch = () => {
+export const createSessionFetch = () => {
     const jar = new CookieJar();
     const sessionFetch = fetchCookie(fetch, jar);
     debug("session created with empty cookie jar");
     return { sessionFetch, jar };
 };
-const randomString = (length) => {
+export const randomString = (length) => {
     if (length <= 0)
         return "";
     let out = "";
@@ -26,12 +26,12 @@ const randomString = (length) => {
     }
     return out;
 };
-const pkcs7Pad = (buffer, blockSize = 16) => {
+export const pkcs7Pad = (buffer, blockSize = 16) => {
     const padding = blockSize - (buffer.length % blockSize);
     const pad = Buffer.alloc(padding, padding);
     return Buffer.concat([buffer, pad]);
 };
-const encryptPassword = (password, salt) => {
+export const encryptPassword = (password, salt) => {
     if (!salt)
         throw new Error("missing salt");
     const prefix = randomString(64);

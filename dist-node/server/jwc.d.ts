@@ -79,6 +79,55 @@ export interface StudentPlanEntry {
     IsExam: string;
     AdjustReason: string;
 }
+export interface StudentCard {
+    department: string;
+    major: string;
+    duration: string;
+    className: string;
+    studentId: string;
+    name: string;
+    gender: string;
+    namePinyin: string;
+    birthday: string;
+    maritalStatus: string;
+    phone: string;
+    majorDirection: string;
+    politicalStatus: string;
+    birthplace: string;
+    admissionMajor: string;
+    ethnicity: string;
+    studentType: string;
+    educationLevel: string;
+    admissionDate: string;
+    address: string;
+    arrivalStation: string;
+    postalCode: string;
+    idCard: string;
+    examId: string;
+    studyResume: {
+        period: string;
+        organization: string;
+        education: string;
+    }[];
+    familyMembers: {
+        name: string;
+        relation: string;
+        workplace: string;
+        phone: string;
+    }[];
+    changes: {
+        type: string;
+        reason: string;
+        date: string;
+        originalDepartment: string;
+        originalMajor: string;
+        originalGrade: string;
+    }[];
+    disciplineCategory: string;
+    graduationCertificate: string;
+    bachelorCertificate: string;
+    printDate: string;
+}
 export declare const grade: (user: JwcUser, term?: string) => Promise<JwcGrade[]>;
 export declare const rank: (user: JwcUser) => Promise<RankEntry[]>;
 export declare const classes: (user: JwcUser, term: string, week: string) => Promise<{
@@ -87,13 +136,7 @@ export declare const classes: (user: JwcUser, term: string, week: string) => Pro
 }>;
 export declare const levelExam: (user: JwcUser) => Promise<LevelExamEntry[]>;
 export declare const studentPlan: (user: JwcUser) => Promise<StudentPlanEntry[]>;
-export declare const summaryMarkdown: (user: JwcUser, term?: string) => Promise<string>;
-export declare const studentInfo: (user: JwcUser) => Promise<{
-    buffer: Buffer<ArrayBuffer>;
-    filename: string;
-    contentType: string;
-    contentDisposition: string;
-}>;
+export declare const studentInfo: (user: JwcUser) => Promise<StudentCard>;
 export declare const minorInfo: (user: JwcUser) => Promise<{
     registrations: MinorRegistrationEntry[];
     payments: MinorPaymentEntry[];

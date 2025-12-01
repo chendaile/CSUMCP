@@ -33,10 +33,26 @@ export const searchBus = async ({ date, startStation, endStation, startTimeLeft,
     }
     const data = (await resp.json());
     const buses = [];
+    const formatDate = (d) => {
+        if (!d)
+            return "";
+        const parts = d.split("-");
+        if (parts.length !== 3)
+            return "";
+        const [y, m, day] = parts;
+        return `${y}年${m.padStart(2, "0")}月${day.padStart(2, "0")}日`;
+    };
+    const friendlyDate = formatDate(date);
     data?.d?.data?.forEach((entry) => {
+        const detailUrl = entry.id && friendlyDate
+            ? `https://wxxy.csu.edu.cn/site/shuttleBus/detail?id=${entry.id}&time=${encodeURIComponent(friendlyDate)}`
+            : undefined;
         buses.push({
+            id: entry.id,
             StartTime: entry.start,
             Station: entry.station,
+            Cross: entry.cross,
+            DetailUrl: detailUrl,
         });
     });
     debug("searchBus parsed buses", buses.length);

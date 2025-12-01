@@ -18,13 +18,14 @@ const toTextResult = (text) => ({
 const usageMarkdown = () => `# CSU MCP 使用手册
 ## 主要工具
 - 成绩/排名/课表/等级考试/培养计划/辅修（csu.grade/rank/classes/level_exam/student_plan/minor_info）
-- 学生信息 PDF（csu.student_info，base64）
-- 成绩 Markdown 汇总（csu.summary，term 已隐藏，抓取全部）
 - 图书馆电子资源/馆藏/复本/座位校区（csu.library_*）
 - 校车查询（csu.bus，站点需从预设列表选择）
+- 校园卡信息/流水（csu.ecard_card / csu.ecard_turnover）
+- 多数工具会返回便于后续操作的明细 URL（如图书详情、校车班次、校园卡流水等），可在外部直接跳转或扩展。
 
 ## 使用提示
 - 异常会返回底层 API 错误；如认证失败请检查账号密码或教务可访问性,如果登入不进去可能是密码多次输入错误
+- 学年学期格式：每年下半年为当年第一学期、上半年为上一学年第二学期，例如当前时间若在 2025 下半年，则学期为 2025-2026-1
 `;
 const usageResource = {
     uri: "res://csu-mcp/usage",
@@ -49,18 +50,6 @@ export const createMcpServer = (opts) => {
             throw new Error(`请求 ${path} 失败: ${resp.status} ${resp.statusText}`);
         }
         return resp.text();
-    };
-    const fetchBinary = async (path) => {
-        const resp = await fetch(buildUrl(path));
-        if (!resp.ok) {
-            throw new Error(`请求 ${path} 失败: ${resp.status} ${resp.statusText}`);
-        }
-        const arrayBuffer = await resp.arrayBuffer();
-        return {
-            base64: Buffer.from(arrayBuffer).toString("base64"),
-            contentType: resp.headers.get("content-type") || "",
-            contentDisposition: resp.headers.get("content-disposition") || "",
-        };
     };
     const credentialProps = {
         id: { type: "string", description: "学号" },
@@ -174,26 +163,6 @@ export const createMcpServer = (opts) => {
             return toJSONResult(data);
         },
     });
-    const studentInfoSchema = z.object({
-        id: z.string(),
-        pwd: z.string(),
-    });
-    toolDefs.push({
-        meta: {
-            name: "csu.student_info",
-            description: "导出学生基本信息 PDF（base64 编码），需学号/密码。",
-            inputSchema: {
-                type: "object",
-                properties: { ...credentialProps },
-                required: ["id", "pwd"],
-            },
-        },
-        schema: studentInfoSchema,
-        handler: async ({ id, pwd }) => {
-            const data = await fetchBinary(`/api/jwc/${encodeURIComponent(id)}/${encodeURIComponent(pwd)}/studentinfo`);
-            return toJSONResult(data);
-        },
-    });
     const studentPlanSchema = z.object({
         id: z.string(),
         pwd: z.string(),
@@ -234,28 +203,6 @@ export const createMcpServer = (opts) => {
             return toJSONResult(data);
         },
     });
-    const summarySchema = z.object({
-        id: z.string(),
-        pwd: z.string(),
-    });
-    toolDefs.push({
-        meta: {
-            name: "csu.summary",
-            description: "生成成绩 Markdown 汇总，自动拉取全部学期，需学号/密码。",
-            inputSchema: {
-                type: "object",
-                properties: {
-                    ...credentialProps,
-                },
-                required: ["id", "pwd"],
-            },
-        },
-        schema: summarySchema,
-        handler: async ({ id, pwd }) => {
-            const data = await fetchText(`/api/jwc/${encodeURIComponent(id)}/${encodeURIComponent(pwd)}/summary`);
-            return toTextResult(data);
-        },
-    });
     const libraryDbSearchSchema = z.object({
         elecName: z.string(),
     });
@@ -281,56 +228,26 @@ export const createMcpServer = (opts) => {
         },
     });
     const libraryBookSearchSchema = z.object({
-        id: z.string(),
-        pwd: z.string(),
         kw: z.string(),
     });
     toolDefs.push({
         meta: {
             name: "csu.library_book_search",
-            description: "图书馆馆藏检索，需学号/密码与关键词 kw，返回搜索结果和状态。",
+            description: "图书馆馆藏检索，仅需关键词 kw，返回搜索结果和状态。",
             inputSchema: {
                 type: "object",
                 properties: {
-                    ...credentialProps,
                     kw: {
                         type: "string",
                         description: "检索关键词",
                     },
                 },
-                required: ["id", "pwd", "kw"],
+                required: ["kw"],
             },
         },
         schema: libraryBookSearchSchema,
-        handler: async ({ id, pwd, kw }) => {
-            const data = await fetchJSON(`/api/library/${encodeURIComponent(id)}/${encodeURIComponent(pwd)}/booksearch?kw=${encodeURIComponent(kw)}`);
-            return toJSONResult(data);
-        },
-    });
-    const libraryBookCopiesSchema = z.object({
-        id: z.string(),
-        pwd: z.string(),
-        recordId: z.string(),
-    });
-    toolDefs.push({
-        meta: {
-            name: "csu.library_book_copies",
-            description: "查询图书馆复本/借阅信息，需学号/密码与 recordId（可以来自book_search）。",
-            inputSchema: {
-                type: "object",
-                properties: {
-                    ...credentialProps,
-                    recordId: {
-                        type: "string",
-                        description: "记录 ID",
-                    },
-                },
-                required: ["id", "pwd", "recordId"],
-            },
-        },
-        schema: libraryBookCopiesSchema,
-        handler: async ({ id, pwd, recordId }) => {
-            const data = await fetchJSON(`/api/library/${encodeURIComponent(id)}/${encodeURIComponent(pwd)}/bookcopies/${encodeURIComponent(recordId)}`);
+        handler: async ({ kw }) => {
+            const data = await fetchJSON(`/api/library/booksearch?kw=${encodeURIComponent(kw)}`);
             return toJSONResult(data);
         },
     });
@@ -347,6 +264,78 @@ export const createMcpServer = (opts) => {
         schema: librarySeatCampusesSchema,
         handler: async () => {
             const data = await fetchJSON(`/api/library/seat/campuses`);
+            return toJSONResult(data);
+        },
+    });
+    const ecardCardSchema = z.object({
+        id: z.string(),
+        pwd: z.string(),
+    });
+    toolDefs.push({
+        meta: {
+            name: "csu.ecard_card",
+            description: "校园卡基础信息查询，需学号/密码。",
+            inputSchema: {
+                type: "object",
+                properties: { ...credentialProps },
+                required: ["id", "pwd"],
+            },
+        },
+        schema: ecardCardSchema,
+        handler: async ({ id, pwd }) => {
+            const data = await fetchJSON(`/api/ecard/${encodeURIComponent(id)}/${encodeURIComponent(pwd)}/card`);
+            return toJSONResult(data);
+        },
+    });
+    const ecardTurnoverSchema = z.object({
+        id: z.string(),
+        pwd: z.string(),
+        timeFrom: z.string().optional(),
+        timeTo: z.string().optional(),
+        amountFrom: z.string().optional(),
+        amountTo: z.string().optional(),
+    });
+    toolDefs.push({
+        meta: {
+            name: "csu.ecard_turnover",
+            description: "校园卡流水查询，timeFrom/timeTo/amountFrom/amountTo 可选，分页固定 size=10 current=1。",
+            inputSchema: {
+                type: "object",
+                properties: {
+                    ...credentialProps,
+                    timeFrom: {
+                        type: "string",
+                        description: "起始日期 YYYY-MM-DD，可留空",
+                    },
+                    timeTo: {
+                        type: "string",
+                        description: "结束日期 YYYY-MM-DD，可留空",
+                    },
+                    amountFrom: {
+                        type: "string",
+                        description: "金额下限（分），可留空",
+                    },
+                    amountTo: {
+                        type: "string",
+                        description: "金额上限（分），可留空",
+                    },
+                },
+                required: ["id", "pwd"],
+            },
+        },
+        schema: ecardTurnoverSchema,
+        handler: async ({ id, pwd, timeFrom, timeTo, amountFrom, amountTo }) => {
+            const qs = new URLSearchParams();
+            if (timeFrom)
+                qs.set("timeFrom", timeFrom);
+            if (timeTo)
+                qs.set("timeTo", timeTo);
+            if (amountFrom)
+                qs.set("amountFrom", amountFrom);
+            if (amountTo)
+                qs.set("amountTo", amountTo);
+            const query = qs.toString() ? `?${qs.toString()}` : "";
+            const data = await fetchJSON(`/api/ecard/${encodeURIComponent(id)}/${encodeURIComponent(pwd)}/turnover${query}`);
             return toJSONResult(data);
         },
     });

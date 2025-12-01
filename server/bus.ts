@@ -10,15 +10,20 @@ export interface BusRequest {
 }
 
 export interface BusEntry {
+  id?: string;
   StartTime: string;
   Station: string[];
+  Cross?: string[];
+  DetailUrl?: string;
 }
 
 interface RawBusResponse {
   d?: {
     data?: {
+      id?: string;
       start: string;
       station: string[];
+      cross?: string[];
     }[];
   };
 }
@@ -65,10 +70,28 @@ export const searchBus = async ({
   }
   const data = (await resp.json()) as RawBusResponse;
   const buses: BusEntry[] = [];
+  const formatDate = (d?: string) => {
+    if (!d) return "";
+    const parts = d.split("-");
+    if (parts.length !== 3) return "";
+    const [y, m, day] = parts;
+    return `${y}年${m.padStart(2, "0")}月${day.padStart(2, "0")}日`;
+  };
+  const friendlyDate = formatDate(date);
+
   data?.d?.data?.forEach((entry) => {
+    const detailUrl =
+      entry.id && friendlyDate
+        ? `https://wxxy.csu.edu.cn/site/shuttleBus/detail?id=${entry.id}&time=${encodeURIComponent(
+            friendlyDate
+          )}`
+        : undefined;
     buses.push({
+      id: entry.id,
       StartTime: entry.start,
       Station: entry.station,
+      Cross: entry.cross,
+      DetailUrl: detailUrl,
     });
   });
   debug("searchBus parsed buses", buses.length);
