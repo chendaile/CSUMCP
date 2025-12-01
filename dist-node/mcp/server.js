@@ -76,14 +76,14 @@ export const createMcpServer = (opts) => {
     toolDefs.push({
         meta: {
             name: "csu.grade",
-            description: "查询成绩列表，需学号/密码，可选 term（示例：2024-2025-1 / 2023-2024-2）。",
+            description: "查询成绩列表，需学号/密码，可选 term（示例：2024-2025-1 / 2023-2024-2）,否则为全部学期数据。",
             inputSchema: {
                 type: "object",
                 properties: {
                     ...credentialProps,
                     term: {
                         type: "string",
-                        description: "学年学期，可留空（格式如 2025-2026-1、2024-2025-2 等）",
+                        description: "学年学期,（格式如 2025-2026-1、2024-2025-2 等）,可留空(代表全部学期)",
                     },
                 },
                 required: ["id", "pwd"],
@@ -262,7 +262,7 @@ export const createMcpServer = (opts) => {
     toolDefs.push({
         meta: {
             name: "csu.library_seat_campuses",
-            description: "获取图书馆自习座位可用校区列表。",
+            description: "获取不同校区图书馆自习座位情况。",
             inputSchema: {
                 type: "object",
                 properties: {},
@@ -305,7 +305,7 @@ export const createMcpServer = (opts) => {
     toolDefs.push({
         meta: {
             name: "csu.ecard_turnover",
-            description: "校园卡流水查询，timeFrom/timeTo/amountFrom/amountTo 可选，分页固定 size=10 current=1。",
+            description: "校园卡流水查询，timeFrom/timeTo/amountFrom/amountTo 可选",
             inputSchema: {
                 type: "object",
                 properties: {
@@ -320,18 +320,18 @@ export const createMcpServer = (opts) => {
                     },
                     amountFrom: {
                         type: "string",
-                        description: "金额下限（分），可留空",
+                        description: "金额下限，可留空",
                     },
                     amountTo: {
                         type: "string",
-                        description: "金额上限（分），可留空",
+                        description: "金额上限，可留空",
                     },
                 },
                 required: ["id", "pwd"],
             },
         },
         schema: ecardTurnoverSchema,
-        handler: async ({ id, pwd, timeFrom, timeTo, amountFrom, amountTo }) => {
+        handler: async ({ id, pwd, timeFrom, timeTo, amountFrom, amountTo, }) => {
             const qs = new URLSearchParams();
             if (timeFrom)
                 qs.set("timeFrom", timeFrom);
