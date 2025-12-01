@@ -117,9 +117,9 @@ export const fetchCardTurnover = async (username, password, params) => {
     if (params.timeTo)
         qs.set("timeTo", params.timeTo);
     if (params.amountFrom !== undefined && params.amountFrom !== null)
-        qs.set("amountFrom", String(params.amountFrom));
+        qs.set("amountFrom", String(Math.round(params.amountFrom * 100)));
     if (params.amountTo !== undefined && params.amountTo !== null)
-        qs.set("amountTo", String(params.amountTo));
+        qs.set("amountTo", String(Math.round(params.amountTo * 100)));
     qs.set("size", "100");
     qs.set("current", "1");
     qs.set("synAccessSource", "pc");

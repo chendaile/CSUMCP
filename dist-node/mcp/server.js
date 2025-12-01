@@ -83,12 +83,7 @@ export const createMcpServer = (opts) => {
                     ...credentialProps,
                     term: {
                         type: "string",
-                        description: "学年学期，可留空。示例：2024-2025-1、2023-2024-2",
-                        enum: [
-                            "2024-2025-1",
-                            "2023-2024-2",
-                            "2023-2024-1",
-                        ],
+                        description: "学年学期，可留空（格式如 2025-2026-1、2024-2025-2 等）",
                     },
                 },
                 required: ["id", "pwd"],

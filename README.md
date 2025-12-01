@@ -25,20 +25,22 @@ npx csu-mcp@latest
 
 ```json
 {
-        "servers": {
+        "mcpServers": {
                 "csu": {
                         "command": "npx",
                         "args": ["-y", "csu-mcp@latest"],
                         "env": {
-                                "CSU_ID": <YOUR_CSU_ID>(OPTINAL but some features need it),
-                                "CSU_PWD": <YOUR_CSU_PWD>(OPTINAL but some features need it),
-                                "PORY": <LOCAL_API_PORT>(OPTINAL),
-                                "API_BASE_URL": <API_URL>(OPTINAL)
+                                "CSU_ID": "YOUR_CSU_ID",
+                                "CSU_PWD": "YOUR_CSU_PWD",
+                                "PORT": "12000",
+                                "API_BASE_URL": "http://127.0.0.1:12000"
                         }
                 }
         }
 }
 ```
+
+说明：上述 env 均为可选；`CSU_ID/CSU_PWD` 供需认证的功能使用；`PORT` 为本地 API 端口；`API_BASE_URL` 为 MCP 访问基址。
 
 ## 本地开发
 
@@ -50,7 +52,6 @@ npm run build   # 生成 dist-node 产物，bin 指向 dist-node/bin/csu-mcp.js
 ## 鉴权说明
 
 - 所有需要学号/密码的接口都可通过环境变量注入：`CSU_ID`、`CSU_PWD`。若设置这两个变量，URL 中的 `:id/:pwd` 会被忽略。
-- 课表 `TimeInWeek` 以周日为 1 起算（“第一天”是上周日），因此 4 表示周三。
 
 ## 能力概览
 
