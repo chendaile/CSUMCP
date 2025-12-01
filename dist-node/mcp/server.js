@@ -15,18 +15,22 @@ const toJSONResult = (data) => ({
 const toTextResult = (text) => ({
     content: [{ type: "text", text }],
 });
-const usageMarkdown = () => `# CSU MCP 使用手册
-## 主要工具
-- 成绩/排名/课表/等级考试/培养计划/辅修（csu.grade/rank/classes/level_exam/student_plan/minor_info）
-- 图书馆电子资源/馆藏/复本/座位校区（csu.library_*）
-- 校车查询（csu.bus，站点需从预设列表选择）
-- 校园卡信息/流水（csu.ecard_card / csu.ecard_turnover）
-- 多数工具会返回便于后续操作的明细 URL（如图书详情、校车班次、校园卡流水等），可在外部直接跳转或扩展。
-
-## 使用提示
-- 异常会返回底层 API 错误；如认证失败请检查账号密码或教务可访问性,如果登入不进去可能是密码多次输入错误
-- 学年学期格式：每年下半年为当年第一学期、上半年为上一学年第二学期，例如当前时间若在 2025 下半年，则学期为 2025-2026-1
-`;
+const usageMarkdown = () => {
+    return [
+        "# CSU MCP 使用手册",
+        "## 主要工具",
+        "- 成绩/排名/课表/等级考试/培养计划/辅修（csu.grade/rank/classes/level_exam/student_plan/minor_info）",
+        "- 图书馆电子资源/馆藏/复本/座位校区（csu.library_*）",
+        "- 校车查询（csu.bus，站点需从预设列表选择）",
+        "- 校园卡信息/流水（csu.ecard_card / csu.ecard_turnover）",
+        "- 多数工具会返回便于后续操作的明细 URL（如图书详情、校车班次、校园卡流水等），可在外部直接跳转或扩展。",
+        "",
+        "## 使用提示",
+        "- 异常会返回底层 API 错误；如认证失败请检查账号密码或教务可访问性,如果登入不进去可能是密码多次输入错误",
+        "- 学年学期格式：每年下半年为当年第一学期、上半年为上一学年第二学期，例如当前时间若在 2025 下半年，则学期为 2025-2026-1",
+        "- 课表（csu.classes）中的 TimeInWeek 以周日为 1 起算（“第一天”是上周日），因此 4 表示周三",
+    ].join("\n");
+};
 const usageResource = {
     uri: "res://csu-mcp/usage",
     name: "CSU MCP 使用手册",

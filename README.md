@@ -7,7 +7,7 @@ CSU 校园 API + MCP 代理。提供教务、图书馆、校车等工具，既�
 无需克隆，直接用 `npx` 一键拉起 API 和 stdio MCP：
 
 ```sh
-npx csu-mcp
+npx csu-mcp@latest
 ```
 
 默认：
@@ -19,8 +19,7 @@ npx csu-mcp
 
 - `PORT`：API 端口（默认 12000）
 - `API_BASE_URL`：MCP 访问的 API 基址（默认 `http://127.0.0.1:<PORT>`）
-
-要求：Node 20+。
+- `CSU_ID` / `CSU_PWD`：统一认证学号/密码（设置后可覆盖 URL 中的 `:id/:pwd`）
 
 ### 客户端（stdio）配置示例
 
@@ -39,6 +38,11 @@ npm install
 npm run build   # 生成 dist-node 产物，bin 指向 dist-node/bin/csu-mcp.js
 ```
 
+## 鉴权说明
+
+- 所有需要学号/密码的接口都可通过环境变量注入：`CSU_ID`、`CSU_PWD`。若设置这两个变量，URL 中的 `:id/:pwd` 会被忽略。
+- 课表 `TimeInWeek` 以周日为 1 起算（“第一天”是上周日），因此 4 表示周三。
+
 ## 工具列表（MCP）
 
 - `csu.grade`：成绩（term 可选，如 2024-2025-1）
@@ -54,4 +58,4 @@ npm run build   # 生成 dist-node 产物，bin 指向 dist-node/bin/csu-mcp.js
 - `csu.ecard_turnover`：校园卡流水（支持日期/金额范围筛选，返回简化字段与明细 URL）
 - `csu.bus`：校车查询（date，crs01/02 途径站）
 
-说明：多数接口会返回可直接访问的明细 URL（如图书详情、校车班次详情、校园卡流水等），方便在外部工具中二次跳转或扩展操作。
+说明：多数接口会返回可直接访问的明细 URL（如图书详情、校车班次详情、校园卡流水等），方便在外部工具中二次跳转或扩展操作；校车接口还会返回 `id`、`cross` 站点与班次详情链接。
