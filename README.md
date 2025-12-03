@@ -11,6 +11,10 @@
 - _校车班次查询、路线导航可联动高德_
 - _工具可返回可跳转的明细 URL，方便扩展或二次开发_
 
+## [百宝箱智能体体验](https://tbox.alipay.com/inc/share/202512APDjTt07695207?platform=WebService)
+
+使用百宝箱智能体 CSU Helper 进行快速体验(不过可能由于模型性能或者上下文限制出现卡死的情况)
+
 ## 快速使用（推荐）
 
 无需克隆，直接用 `npx` 一键拉起 API 和 stdio MCP：
@@ -68,6 +72,12 @@ API_BASE_URL=<API_URL> MCP_PORT=<SSE_PORT> npm run start:mcp:sse
 # 启动sse mcp服务, 可选API_BASE_URL, 默认为本地12000端口, 可选MCP_PORT SSE端口
 API_BASE_URL=<API_URL> npm run start:mcp:stdio
 # 启动sse mcp服务, 可选API_BASE_URL, 默认为本地12000端口
+```
+
+2. Docker 本地开发
+
+```
+docker pull oft-registry.cn-shanghai.cr.aliyuncs.com/oft/csumcp:[镜像版本号]
 ```
 
 ## 能力概览
