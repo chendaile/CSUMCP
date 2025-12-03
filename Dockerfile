@@ -6,7 +6,6 @@ WORKDIR /app
 RUN apk add --no-cache nginx
 
 COPY package.json .
-COPY package-lock.json . || echo "Lock file not found, skipping..."
 
 COPY . .
 
