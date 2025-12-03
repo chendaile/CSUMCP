@@ -120,8 +120,17 @@ export const fetchCardTurnover = async (username, password, params) => {
         qs.set("amountFrom", String(Math.round(params.amountFrom * 100)));
     if (params.amountTo !== undefined && params.amountTo !== null)
         qs.set("amountTo", String(Math.round(params.amountTo * 100)));
-    qs.set("size", "100");
-    qs.set("current", "1");
+    const size = params.size !== undefined && params.size !== null && params.size > 0
+        ? params.size
+        : 20;
+    const current = params.current !== undefined &&
+        params.current !== null &&
+        params.current > 0
+        ? params.current
+        : 1;
+    qs.set("size", String(size));
+    qs.set("current", String(current));
+    // ecard 搜索接口要求带 synAccessSource，否则会返回 405
     qs.set("synAccessSource", "pc");
     const url = `${baseUrl}?${qs.toString()}`;
     const headers = {

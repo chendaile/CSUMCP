@@ -18,7 +18,7 @@ const renderRoutes = (routes = []) => {
 
 const fetchApiRoot = async () => {
   try {
-    const resp = await fetch("/");
+    const resp = await fetch("/api/meta");
     const data = await resp.json();
     apiStatusEl.innerHTML = formatStatus(true, "在线");
     if (Array.isArray(data.routes)) {

@@ -20,6 +20,22 @@ import { logger } from "../logger.js";
 const app = express();
 const PORT = process.env.PORT || 12000;
 
+const ROUTES = [
+        "/api/jwc/:id/:pwd/grade?term=",
+        "/api/jwc/:id/:pwd/rank",
+        "/api/jwc/:id/:pwd/class/:term/:week",
+        "/api/jwc/:id/:pwd/levelexam",
+        "/api/jwc/:id/:pwd/studentinfo",
+        "/api/jwc/:id/:pwd/studentplan",
+        "/api/jwc/:id/:pwd/minorinfo",
+        "/api/library/dbsearch?elecName=",
+        "/api/library/booksearch?kw=",
+        "/api/library/seat/campuses",
+        "/api/ecard/:id/:pwd/card",
+        "/api/ecard/:id/:pwd/turnover?timeFrom=&timeTo=&amountFrom=&amountTo=",
+        "/api/bus?date=&crs01=&crs02=",
+];
+
 const maskSensitive = (value?: string) => {
         if (!value) return "";
         if (value.length <= 2) return "***";
@@ -116,21 +132,14 @@ const handleEcardTurnover = async (
 app.get("/", (_req, res) => {
         res.json({
                 service: "CSU MCP",
-                routes: [
-                        "/api/jwc/:id/:pwd/grade?term=",
-                        "/api/jwc/:id/:pwd/rank",
-                        "/api/jwc/:id/:pwd/class/:term/:week",
-                        "/api/jwc/:id/:pwd/levelexam",
-                        "/api/jwc/:id/:pwd/studentinfo",
-                        "/api/jwc/:id/:pwd/studentplan",
-                        "/api/jwc/:id/:pwd/minorinfo",
-                        "/api/library/dbsearch?elecName=",
-                        "/api/library/booksearch?kw=",
-                        "/api/library/seat/campuses",
-                        "/api/ecard/:id/:pwd/card",
-                        "/api/ecard/:id/:pwd/turnover?timeFrom=&timeTo=&amountFrom=&amountTo=",
-                        "/api/bus?date=&crs01=&crs02=",
-                ],
+                routes: ROUTES,
+        });
+});
+
+app.get("/api/meta", (_req, res) => {
+        res.json({
+                        service: "CSU MCP",
+                        routes: ROUTES,
         });
 });
 
