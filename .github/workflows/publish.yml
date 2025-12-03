@@ -1,10 +1,30 @@
-name: publish
+name: publish-npm
 
 on:
         push:
                 tags:
                         - "v[0-9]*"
-                brances:
-                        - "main"
+
+permissions:
+        contents: read
+        id-token: write
 
 jobs:
+        publish:
+                runs-on: ubuntu-latest
+                steps:
+                        - uses: actions/checkout@v4
+
+                        - uses: actions/setup-node@v4
+                          with:
+                                  node-version: "20"
+                                  registry-url: "https://registry.npmjs.org"
+
+                        - name: Install
+                          run: npm ci
+
+                        - name: Build
+                          run: npm run Build
+
+                        - name: Publish
+                          run: npm publish --provenance
