@@ -1,6 +1,15 @@
-# CSU MCP
+[![SVG Banners](https://svg-banners.vercel.app/api?type=origin&text1=CSU%20MCP&text2=BY%20Oftheloneliness&width=800&height=400)](https://github.com/Akshay090/svg-banners)
 
-CSU 校园 API + MCP 代理。提供教务、图书馆、校车等工具，既可作为本地 API 也可直接通过 MCP 使用。
+中南大学 CSU 校园**API × MCP**代理：你的全能校园**数据引擎**。
+教务、图书馆、校车、校园卡一站式接入，可本地调用，也可直接走 MCP。
+**能做什么：**
+
+- _自动整理成绩、排名、等级考试，一键生成简历/学习报告_
+- _课表智能渲染，周视图、日视图随取_
+- _校园卡流水统计，自动生成消费分析_
+- _图书检索、座位参考、电子资源直达_
+- _校车班次查询、路线导航可联动高德_
+- _工具可返回可跳转的明细 URL，方便扩展或二次开发_
 
 ## 快速使用（推荐）
 
@@ -12,7 +21,7 @@ npx csu-mcp@latest
 
 默认：
 
-- API 监听 `12000`
+- API 监听本地 `12000`端口
 - MCP stdio 指向 `http://127.0.0.1:12000`
 
 可用环境变量调整：
@@ -20,6 +29,7 @@ npx csu-mcp@latest
 - `PORT`：API 端口（默认 12000）
 - `API_BASE_URL`：MCP 访问的 API 基址（默认 `http://127.0.0.1:<PORT>`）
 - `CSU_ID` / `CSU_PWD`：统一认证学号/密码（设置后可覆盖 URL 中的 `:id/:pwd`）
+- `MCP_PORT`: sse 开放的本地端口,**注意:此时并不用于 npx 的直接使用**
 
 ### 客户端（stdio）配置示例
 
@@ -41,23 +51,30 @@ npx csu-mcp@latest
 ```
 
 说明：上述 env 均为可选；`CSU_ID/CSU_PWD` 供需认证的功能使用；`PORT` 为本地 API 端口；`API_BASE_URL` 为 MCP 访问基址。
+**注意:在百宝箱里目前不支持通过环境变量传输账号密码,只能通过对话框传输**
 
 ## 本地开发
 
+1. 克隆 [github](https://github.com/chendaile/CSUMCP.git) 仓库
+
 ```sh
+git clone https://github.com/chendaile/CSUMCP.git
 npm install
-npm run build   # 生成 dist-node 产物，bin 指向 dist-node/bin/csu-mcp.js
+npm run build
+
+PORT=<LOCAL_PORT> npm run start:api
+# 启动api服务, 可选本地端口PORT, 默认12000
+API_BASE_URL=<API_URL> MCP_PORT=<SSE_PORT> npm run start:mcp:sse
+# 启动sse mcp服务, 可选API_BASE_URL, 默认为本地12000端口, 可选MCP_PORT SSE端口
+API_BASE_URL=<API_URL> npm run start:mcp:stdio
+# 启动sse mcp服务, 可选API_BASE_URL, 默认为本地12000端口
 ```
-
-## 鉴权说明
-
-- 所有需要学号/密码的接口都可通过环境变量注入：`CSU_ID`、`CSU_PWD`。若设置这两个变量，URL 中的 `:id/:pwd` 会被忽略。
 
 ## 能力概览
 
 - 教务：成绩、排名、课表、等级考试、培养计划、辅修信息。
 - 校园卡：账户信息、近期开销流水（含明细 URL，金额换算为元）。
-- 图书馆：电子资源检索、馆藏检索（含详情 URL）、座位校区/楼层信息（seat2 链接）。
+- 图书馆：电子资源检索、馆藏检索（含详情 URL）、座位校区/楼层信息（以及预约 URL）。
 - 校车：班次查询，返回 id、途径站、详情链接，便于跳转查看。
 
 ## 工具列表（MCP）
