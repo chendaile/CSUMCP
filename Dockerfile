@@ -1,16 +1,16 @@
-FROM node:20-alpine
+FROM registry.cn-shanghai.aliyuncs.com/acs/node:20-alpine
 
 WORKDIR /app
 
 # 安装 nginx
 RUN apk add --no-cache nginx
 
-COPY package*.json ./
-RUN npm ci
+COPY package.json .
+COPY package-lock.json . || echo "Lock file not found, skipping..."
 
 COPY . .
 
-RUN npm run build && npm prune --production
+RUN npm ci --only=production && npm cache clean --force
 
 # 覆盖 nginx 配置
 COPY nginx.conf /etc/nginx/nginx.conf
