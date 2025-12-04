@@ -1,4 +1,4 @@
-FROM registry.cn-shanghai.aliyuncs.com/acs-public/node:20-alpine
+FROM oft-registry.cn-shanghai.cr.aliyuncs.com/oft/node:25-pine
 
 WORKDIR /workspace
 
