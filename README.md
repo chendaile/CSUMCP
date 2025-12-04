@@ -1,6 +1,10 @@
 [![SVG Banners](https://svg-banners.vercel.app/api?type=origin&text1=CSU%20MCP&text2=BY%20Oftheloneliness&width=800&height=400)](https://github.com/Akshay090/svg-banners)
 
-中南大学 CSU 校园**API × MCP**代理：你的全能校园**数据引擎**。
+[![Website](https://img.shields.io/badge/Website-CSUMCP.com-blue)](https://cdl.migow.club/) [![NPM Version](https://img.shields.io/npm/v/csu-mcp?color=red)](https://www.npmjs.com/package/csu-mcp) [![MIT licensed](https://img.shields.io/npm/l/%40upstash%2Fcontext7-mcp)](./LICENSE)
+
+# 中南大学 CSU 校园**API × MCP**代理
+
+你的全能校园**数据引擎**,
 教务、图书馆、校车、校园卡一站式接入，可本地调用，也可直接走 MCP。
 **能做什么：**
 
@@ -15,9 +19,9 @@
 
 使用百宝箱智能体 CSU Helper 进行快速体验(不过可能由于模型性能或者上下文限制出现卡死的情况)
 
-## 快速使用（推荐）
+# 快速使用（推荐）
 
-无需克隆，直接用 `npx` 一键拉起 API 和 stdio MCP：
+## 无需克隆，直接用 `npx` 一键拉起 API 和 stdio MCP：
 
 ```sh
 npx csu-mcp@latest
@@ -35,7 +39,7 @@ npx csu-mcp@latest
 - `CSU_ID` / `CSU_PWD`：统一认证学号/密码（设置后可覆盖 URL 中的 `:id/:pwd`）
 - `MCP_PORT`: sse 开放的本地端口,**注意:此时并不用于 npx 的直接使用**
 
-### 客户端（stdio）配置示例
+**客户端（stdio）配置示例**
 
 ```json
 {
@@ -54,12 +58,34 @@ npx csu-mcp@latest
 }
 ```
 
-说明：上述 env 均为可选；`CSU_ID/CSU_PWD` 供需认证的功能使用；`PORT` 为本地 API 端口；`API_BASE_URL` 为 MCP 访问基址。
-**注意:在百宝箱里目前不支持通过环境变量传输账号密码,只能通过对话框传输**
+## 使用已经部署的 sse 服务器:
 
-## 本地开发
+**客户端（sse）配置示例**
 
-1. 克隆 [github](https://github.com/chendaile/CSUMCP.git) 仓库
+```json
+{
+        "mcpServers": {
+                "csu": {
+                        "type": "sse",
+                        "url": "https://cdl.migow.club/mcp/",
+                        "env": {
+                                "CSU_ID": "YOUR_CSU_ID",
+                                "CSU_PWD": "YOUR_CSU_PWD",
+                                "PORT": "12000",
+                                "API_BASE_URL": "http://127.0.0.1:12000"
+                        }
+                }
+        }
+}
+```
+
+> [!NOTE]
+> 在百宝箱里目前不支持通过环境变量传输账号密码,只能通过对话框传输
+> 上述 env 均为可选；`CSU_ID/CSU_PWD` 供需认证的功能使用；`PORT` 为本地 API 端口；`API_BASE_URL` 为 MCP 访问基址。
+
+# 本地开发
+
+## 克隆 [github](https://github.com/chendaile/CSUMCP.git) 仓库
 
 ```sh
 git clone https://github.com/chendaile/CSUMCP.git
@@ -74,20 +100,20 @@ API_BASE_URL=<API_URL> npm run start:mcp:stdio
 # 启动sse mcp服务, 可选API_BASE_URL, 默认为本地12000端口
 ```
 
-2. Docker 本地开发
+## Docker 本地开发
 
 ```
-docker pull oft-registry.cn-shanghai.cr.aliyuncs.com/oft/csumcp:[镜像版本号]
+docker pull oft-registry.cn-shanghai.cr.aliyuncs.com/oft/csumcp:latest
 ```
 
-## 能力概览
+# 能力概览
 
 - 教务：成绩、排名、课表、等级考试、培养计划、辅修信息。
 - 校园卡：账户信息、近期开销流水（含明细 URL，金额换算为元）。
 - 图书馆：电子资源检索、馆藏检索（含详情 URL）、座位校区/楼层信息（以及预约 URL）。
 - 校车：班次查询，返回 id、途径站、详情链接，便于跳转查看。
 
-## 工具列表（MCP）
+# 工具列表（MCP）
 
 - `csu.grade`：成绩（term 可选，如 2024-2025-1）
 - `csu.rank`：专业排名
