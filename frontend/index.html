@@ -1,122 +1,13 @@
 <!doctype html>
-<html lang="zh-CN">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1.0">
-  <title>CSU MCP 面板</title>
-  <link rel="stylesheet" href="./styles.css">
-</head>
-<body>
-  <div class="page">
-    <header class="topbar">
-      <div class="brand">
-        <div class="brand-mark">CSU</div>
-        <div>
-          <div class="brand-name">MCP</div>
-          <div class="brand-sub">中南大学 · 校园生产力工具</div>
-        </div>
-      </div>
-      <div class="top-links">
-        <a href="https://www.npmjs.com/package/csu-mcp" target="_blank" rel="noreferrer">npm</a>
-        <a href="https://github.com/chendaile/CSUMCP" target="_blank" rel="noreferrer">GitHub</a>
-      </div>
-    </header>
-
-    <section class="hero">
-      <div class="hero-text">
-        <p class="eyebrow">API + MCP</p>
-        <h1>一站式校园数据中台</h1>
-        <p class="lede">
-          自动探测当前节点可用性，整理全部能力清单与推荐调用流程。前往 npm / GitHub 获取最新文档与更新。
-        </p>
-        <div class="cta">
-          <a class="btn primary" href="https://www.npmjs.com/package/csu-mcp" target="_blank" rel="noreferrer">查看 npm 包</a>
-          <a class="btn ghost" href="https://github.com/chendaile/CSUMCP" target="_blank" rel="noreferrer">GitHub 仓库</a>
-        </div>
-      </div>
-      <div class="hero-card">
-        <div class="pill">实时检测</div>
-        <div class="hero-stat">
-          <span class="label">API 状态</span>
-          <span id="apiStatus" class="value">检测中…</span>
-        </div>
-        <div class="hero-stat">
-          <span class="label">MCP（SSE）</span>
-          <span id="mcpStatus" class="value">等待探测…</span>
-        </div>
-        <div class="hero-hint" id="checkDay"></div>
-      </div>
-    </section>
-
-    <section class="grid">
-      <div class="card" id="apiRoutes">
-        <div class="card-header">
-          <div class="icon">🛰️</div>
-          <div>
-            <h2>API 入口</h2>
-            <p>自动从根路径拉取所有可用路由</p>
-          </div>
-        </div>
-        <ul class="pill-list" id="routeList"></ul>
-      </div>
-
-      <div class="card">
-        <div class="card-header">
-          <div class="icon">🧭</div>
-          <div>
-            <h2>推荐调用流程</h2>
-            <p>按场景串起多工具，生成 Markdown</p>
-          </div>
-        </div>
-        <ol class="flow">
-          <li>简历/学业总结：调用成绩、排名、等级考试、培养计划与辅修，按学期分节输出表格并附总评。</li>
-          <li>校园卡流水：设定日期/金额范围，列出时间、商户、金额（元）、备注、余额并给出总计。</li>
-          <li>图书检索：搜索后展示书名/作者/状态，并附详情 URL 便于跳转。</li>
-          <li>课表渲染：周日为 1，生成 7 列周视图或分日列表，标注节次与周次。</li>
-          <li>座位预约：列出校区与楼层 Seat2 链接，用户点击即可在浏览器预约。</li>
-          <li>校车：展示班次 id、时间、途径站，附详情链接。</li>
-        </ol>
-      </div>
-
-      <div class="card">
-        <div class="card-header">
-          <div class="icon">🛡️</div>
-          <div>
-            <h2>环境与凭证</h2>
-            <p>支持通过环境变量注入学号/密码</p>
-          </div>
-        </div>
-        <ul class="list">
-          <li><strong>CSU_ID / CSU_PWD</strong>：设置后可忽略 URL 参数</li>
-          <li><strong>API_BASE_URL</strong>：MCP 指向的 API 基址</li>
-          <li><strong>PORT / MCP_PORT</strong>：API、MCP 监听端口（默认 12000 / 13000）</li>
-        </ul>
-      </div>
-
-      <div class="card">
-        <div class="card-header">
-          <div class="icon">📌</div>
-          <div>
-            <h2>支持的能力</h2>
-            <p>教务、图书馆、校园卡、校车等</p>
-          </div>
-        </div>
-        <div class="tags">
-          <span class="tag">成绩/排名/课表</span>
-          <span class="tag">等级考试</span>
-          <span class="tag">培养计划/辅修</span>
-          <span class="tag">图书馆检索+详情 URL</span>
-          <span class="tag">座位 Seat2 链接</span>
-          <span class="tag">校园卡余额/流水</span>
-          <span class="tag">校车班次 + 详情</span>
-        </div>
-      </div>
-    </section>
-
-    <footer class="footer">
-      <p>CSU MCP · 对外开放 API & MCP 工具集 · <a href="https://www.npmjs.com/package/csu-mcp" target="_blank" rel="noreferrer">npm</a> · <a href="https://github.com/chendaile/CSUMCP" target="_blank" rel="noreferrer">GitHub</a></p>
-    </footer>
-  </div>
-  <script type="module" src="./main.js"></script>
-</body>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>frontend</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
 </html>

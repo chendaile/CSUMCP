@@ -9,7 +9,13 @@ COPY package.json .
 
 COPY . .
 
+# 安装后端依赖（仅生产）
 RUN npm ci --only=production && npm cache clean --force
+
+# 构建前端
+WORKDIR /app/frontend
+RUN npm ci && npm run build
+WORKDIR /app
 
 # 覆盖 nginx 配置
 COPY nginx.conf /etc/nginx/nginx.conf
