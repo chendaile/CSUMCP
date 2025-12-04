@@ -1,10 +1,9 @@
-FROM oft-registry.cn-shanghai.cr.aliyuncs.com/oft/node:25
+FROM oft-registry.cn-shanghai.cr.aliyuncs.com/oft/node:25-alpine
 
 WORKDIR /workspace
 
 # 安装 nginx
-RUN apt-get update && apt-get install -y --no-install-recommends nginx && rm -rf /var/lib/apt/lists/*
-
+RUN apk add --no-cache nginx
 
 COPY package.json .
 
