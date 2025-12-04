@@ -1,11 +1,8 @@
-node_modules
 npm-debug.log
 *.log
 tmp
-.git
 .kilocode
 .npm-cache
 third-party
 db
 eslint.config.js
-.gitignore
