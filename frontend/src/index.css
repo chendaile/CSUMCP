@@ -1,0 +1,37 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:wght@400;500;600&display=swap');
+
+:root {
+  --sand: #f5f2eb;
+  --ink: #2c2a26;
+  --stone: #d6d1c7;
+  --accent: #433e38;
+  --glass: rgba(255, 255, 255, 0.65);
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  color: var(--ink);
+  background-color: var(--sand);
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: radial-gradient(circle at 10% 20%, rgba(67, 62, 56, 0.1), transparent 30%),
+    radial-gradient(circle at 80% 10%, rgba(214, 209, 199, 0.35), transparent 35%),
+    var(--sand);
+  color: var(--ink);
+  min-height: 100vh;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+::selection {
+  background: var(--stone);
+  color: var(--ink);
+}
