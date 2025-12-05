@@ -67,13 +67,7 @@ npx csu-mcp@latest
         "mcpServers": {
                 "csu": {
                         "type": "sse",
-                        "url": "https://cdl.migow.club/mcp/",
-                        "env": {
-                                "CSU_ID": "YOUR_CSU_ID",
-                                "CSU_PWD": "YOUR_CSU_PWD",
-                                "PORT": "12000",
-                                "API_BASE_URL": "http://127.0.0.1:12000"
-                        }
+                        "url": "https://cdl.migow.club/mcp/"
                 }
         }
 }
