@@ -2,7 +2,7 @@
         "name": "csu-mcp",
         "description": "CSU 校园 API + MCP 代理。提供教务、图书馆、校车等工具，既可作为本地 API 也可直接通过 MCP 使用",
         "private": false,
-        "version": "3.1.1",
+        "version": "3.1.2",
         "type": "module",
         "bin": {
                 "csu-mcp": "./dist-node/bin/csu-mcp.js"
