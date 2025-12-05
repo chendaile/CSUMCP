@@ -44,18 +44,18 @@ const usageMarkdown = () => {
                 "你是一个会使用 CSUMCP 的中南大学学生的数据查询分析者。",
                 "",
                 "## 常见需求和操作指引",
-                "1. **制作简历**：依次调用 csu.student_plan、csu.minor_info、csu.rank、csu.level_exam、csu.grade；需要用户提供学号和密码。",
-                "2. **预约图书馆座位**：调用 csu.library_seat_campuses，返回各校区/楼层剩余座位和对应预约 URL，供用户自行预约。",
-                "3. **查看校园卡收支流水**：调用 csu.ecard_turnover、csu.ecard_card；需要用户提供学号和密码，返回流水与校园卡基本信息。",
+                "1. **制作简历**：依次调用 student_plan、minor_info、rank、level_exam、grade；需要用户提供学号和密码。",
+                "2. **预约图书馆座位**：调用 library_seat_campuses，返回各校区/楼层剩余座位和对应预约 URL，供用户自行预约。",
+                "3. **查看校园卡收支流水**：调用 ecard_turnover、ecard_card；需要用户提供学号和密码，返回流水与校园卡基本信息。",
                 "4. **查看校园摆渡车/规划出行**：",
                 "   - 先列出可选站点让用户选择：",
                 '     "中南大学潇湘校区(北3门)", "中南大学潇湘校区机电楼", "东塘", "潇湘校区艺术楼", "潇湘校区教学楼D座南坪",',
                 '     "升华学生公寓大门", "岳麓山校区图书馆前坪", "开福校区", "杏林校区", "杏林校区大门",',
                 '     "天心校区图书馆前坪", "天心校区办公楼前坪", "麓南校区一教学楼前坪", "科教新村"',
                 "   - 询问出发地/目的地和查询日期（可用 get_current_time 获取今天日期）。",
-                "   - 调用 csu.bus 获取班次；可结合高德地图 MCP 给出起终点行程信息。",
+                "   - 调用 bus 获取班次；可结合高德地图 MCP 给出起终点行程信息。",
                 "5. **查看课表信息**：",
-                "   - 调用 csu.classes，需学号密码，询问学期与周次；如需与当前日期相关可用 get_current_time。",
+                "   - 调用 classes，需学号密码，询问学期与周次；如需与当前日期相关可用 get_current_time。",
                 "   - 注意：返回的 TimeInWeek 减 1 即为一周中的第几天，例如 TimeInWeek=2 表示周一。",
                 "   - 2025-2026-1 学期周次参考：",
                 "     第1周 2025-09-08日至2025-09-13日；第2周 2025-09-14日至2025-09-20日；",
@@ -69,7 +69,7 @@ const usageMarkdown = () => {
                 "     第17周 2025-12-28日至2026-01-03日；第18周 2026-01-04日至2026-01-10日；",
                 "     第19周 2026-01-11日至2026-01-17日；第20周 2026-01-18日至2026-01-24日；",
                 "     第21周 2026-01-25日至2026-01-31日；第22周 2026-02-01日至2026-02-07日。",
-                "6. **查询图书馆图书**：调用 csu.library_book_search 查询书籍信息，或 csu.library_db_search 查询学校数据库。",
+                "6. **查询图书馆图书**：调用 library_book_search 查询书籍信息，或 library_db_search 查询学校数据库。",
         ].join("\n");
 };
 
@@ -126,7 +126,7 @@ export const createMcpServer = (
         });
         toolDefs.push({
                 meta: {
-                        name: "csu.grade",
+                        name: "grade",
                         description:
                                 "查询成绩列表，需学号/密码，可选 term（示例：2024-2025-1 / 2023-2024-2）,否则为全部学期数据。",
                         inputSchema: {
@@ -162,7 +162,7 @@ export const createMcpServer = (
         });
         toolDefs.push({
                 meta: {
-                        name: "csu.rank",
+                        name: "rank",
                         description:
                                 "查询专业排名，需学号/密码，返回各学期综合成绩与排名。",
                         inputSchema: {
@@ -190,7 +190,7 @@ export const createMcpServer = (
         });
         toolDefs.push({
                 meta: {
-                        name: "csu.classes",
+                        name: "classes",
                         description:
                                 "查询课表，需学号/密码 + term（形如 2024-2025-1）与 week（0=全周；1、2...=对应周次），返回按周几/节次排布的矩阵。",
                         inputSchema: {
@@ -232,7 +232,7 @@ export const createMcpServer = (
         });
         toolDefs.push({
                 meta: {
-                        name: "csu.level_exam",
+                        name: "level_exam",
                         description:
                                 "查询等级考试成绩（如 CET、计算机等级等），需学号/密码。",
                         inputSchema: {
@@ -258,7 +258,7 @@ export const createMcpServer = (
         });
         toolDefs.push({
                 meta: {
-                        name: "csu.student_plan",
+                        name: "student_plan",
                         description: "查询培养计划课程列表，需学号/密码。",
                         inputSchema: {
                                 type: "object",
@@ -283,7 +283,7 @@ export const createMcpServer = (
         });
         toolDefs.push({
                 meta: {
-                        name: "csu.minor_info",
+                        name: "minor_info",
                         description: "查询辅修报名与缴费记录，需学号/密码。",
                         inputSchema: {
                                 type: "object",
@@ -307,7 +307,7 @@ export const createMcpServer = (
         });
         toolDefs.push({
                 meta: {
-                        name: "csu.library_db_search",
+                        name: "library_db_search",
                         description:
                                 "图书馆电子资源检索，传 elecName 关键词，返回中外文库列表。",
                         inputSchema: {
@@ -338,7 +338,7 @@ export const createMcpServer = (
         });
         toolDefs.push({
                 meta: {
-                        name: "csu.library_book_search",
+                        name: "library_book_search",
                         description:
                                 "图书馆馆藏检索，仅需关键词 kw，返回搜索结果和状态。",
                         inputSchema: {
@@ -366,7 +366,7 @@ export const createMcpServer = (
         const librarySeatCampusesSchema = z.object({});
         toolDefs.push({
                 meta: {
-                        name: "csu.library_seat_campuses",
+                        name: "library_seat_campuses",
                         description: "获取不同校区图书馆自习座位情况。",
                         inputSchema: {
                                 type: "object",
@@ -388,7 +388,7 @@ export const createMcpServer = (
         });
         toolDefs.push({
                 meta: {
-                        name: "csu.ecard_card",
+                        name: "ecard_card",
                         description: "校园卡基础信息查询，需学号/密码。",
                         inputSchema: {
                                 type: "object",
@@ -417,7 +417,7 @@ export const createMcpServer = (
         });
         toolDefs.push({
                 meta: {
-                        name: "csu.ecard_turnover",
+                        name: "ecard_turnover",
                         description:
                                 "校园卡流水查询，timeFrom/timeTo/amountFrom/amountTo 可选",
                         inputSchema: {
@@ -493,7 +493,7 @@ export const createMcpServer = (
         ];
         toolDefs.push({
                 meta: {
-                        name: "csu.bus",
+                        name: "bus",
                         description:
                                 "查询校车班次，需日期与途径站点（如下所列），返回班次列表。",
                         inputSchema: {
